@@ -36,7 +36,12 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+typedef enum
+{
+    WATER_LEVEL_NORMAL = 0,
+    WATER_LEVEL_HIGH,
+    WATER_LEVEL_LOW
+} WaterLevelEvent_t;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -59,6 +64,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define HIGH_WATER_Pin GPIO_PIN_0
+#define HIGH_WATER_GPIO_Port GPIOC
+#define HIGH_WATER_EXTI_IRQn EXTI0_IRQn
+#define LOW_WATER_Pin GPIO_PIN_1
+#define LOW_WATER_GPIO_Port GPIOC
+#define LOW_WATER_EXTI_IRQn EXTI1_IRQn
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3

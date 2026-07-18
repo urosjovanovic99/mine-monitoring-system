@@ -25,7 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usart.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,6 +55,23 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for WaterLevelTask */
+osThreadId_t WaterLevelTaskHandle;
+const osThreadAttr_t WaterLevelTask_attributes = {
+  .name = "WaterLevelTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for pumpCommandQueue */
+osMessageQueueId_t pumpCommandQueueHandle;
+const osMessageQueueAttr_t pumpCommandQueue_attributes = {
+  .name = "pumpCommandQueue"
+};
+/* Definitions for waterLevelSemaphore */
+osSemaphoreId_t waterLevelSemaphoreHandle;
+const osSemaphoreAttr_t waterLevelSemaphore_attributes = {
+  .name = "waterLevelSemaphore"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -61,6 +79,7 @@ const osThreadAttr_t defaultTask_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
+void StartWaterLevelTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -78,6 +97,10 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* creation of waterLevelSemaphore */
+  waterLevelSemaphoreHandle = osSemaphoreNew(1, 0, &waterLevelSemaphore_attributes);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -86,6 +109,10 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of pumpCommandQueue */
+  pumpCommandQueueHandle = osMessageQueueNew (16, sizeof(uint16_t), &pumpCommandQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -93,6 +120,9 @@ void MX_FREERTOS_Init(void) {
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of WaterLevelTask */
+  WaterLevelTaskHandle = osThreadNew(StartWaterLevelTask, NULL, &WaterLevelTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -122,8 +152,51 @@ void StartDefaultTask(void *argument)
   /* USER CODE END StartDefaultTask */
 }
 
+/* USER CODE BEGIN Header_StartWaterLevelTask */
+/**
+* @brief Function implementing the WaterLevelTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartWaterLevelTask */
+void StartWaterLevelTask(void *argument)
+{
+  /* USER CODE BEGIN StartWaterLevelTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    if (osSemaphoreAcquire(waterLevelSemaphoreHandle, osWaitForever) == osOK)
+    {
+      GPIO_PinState highSet = HAL_GPIO_ReadPin(HIGH_WATER_GPIO_Port, HIGH_WATER_Pin);
+      GPIO_PinState lowSet  = HAL_GPIO_ReadPin(LOW_WATER_GPIO_Port, LOW_WATER_Pin);
+
+      WaterLevelEvent_t evt;
+      const char *msg;
+      if (highSet == GPIO_PIN_SET)
+      {
+        evt = WATER_LEVEL_HIGH;
+        msg = "WaterLevelTask: HIGH -> pump ON\r\n";
+      }
+      else if (lowSet == GPIO_PIN_SET)
+      {
+        evt = WATER_LEVEL_LOW;
+        msg = "WaterLevelTask: LOW -> pump OFF\r\n";
+      }
+      else
+      {
+        evt = WATER_LEVEL_NORMAL;
+        msg = "WaterLevelTask: NORMAL (no action)\r\n";
+      }
+
+      /* TEMPORARY test-only output so the EXTI->task path is observable in
+       * Renode. Remove or move into UICommsTask once real JSON telemetry is back. */
+      HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
+
+      osMessageQueuePut(pumpCommandQueueHandle, &evt, 0, 0);
+    }
+  }
+  /* USER CODE END StartWaterLevelTask */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
-/* USER CODE END Application */
-

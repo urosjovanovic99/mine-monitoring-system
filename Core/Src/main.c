@@ -169,7 +169,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+extern osSemaphoreId_t waterLevelSemaphoreHandle;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == HIGH_WATER_Pin || GPIO_Pin == LOW_WATER_Pin)
+    {
+        osSemaphoreRelease(waterLevelSemaphoreHandle);
+    }
+}
 /* USER CODE END 4 */
 
 /**
