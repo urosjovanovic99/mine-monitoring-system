@@ -1,5 +1,5 @@
 ../Core/Src/main.c:68:5:main	1
-../Core/Src/main.c:123:6:SystemClock_Config	4
-../Core/Src/main.c:175:6:HAL_GPIO_EXTI_Callback	3
-../Core/Src/main.c:192:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:210:6:Error_Handler	1
+../Core/Src/main.c:124:6:SystemClock_Config	4
+../Core/Src/main.c:176:6:HAL_GPIO_EXTI_Callback	3
+../Core/Src/main.c:193:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:211:6:Error_Handler	1

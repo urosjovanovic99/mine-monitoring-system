@@ -8,10 +8,12 @@
 #ifndef INC_SENSOR_ADC_H_
 #define INC_SENSOR_ADC_H_
 
-#define METHANE_CRITICAL_THRESHOLD 1000
-
 #include "adc.h"
 #include "FreeRTOS.h"
+
+#define METHANE_CRITICAL_THRESHOLD 1000
+#define CO_CRITICAL_THRESHOLD 1000
+
 
 /* USER CODE BEGIN Variables */
 typedef struct

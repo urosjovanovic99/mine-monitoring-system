@@ -89,6 +89,11 @@ osMutexId_t sensorDataMutexHandle;
 const osMutexAttr_t sensorDataMutex_attributes = {
   .name = "sensorDataMutex"
 };
+/* Definitions for uartLogMutex */
+osMutexId_t uartLogMutexHandle;
+const osMutexAttr_t uartLogMutex_attributes = {
+  .name = "uartLogMutex"
+};
 /* Definitions for waterLevelSemaphore */
 osSemaphoreId_t waterLevelSemaphoreHandle;
 const osSemaphoreAttr_t waterLevelSemaphore_attributes = {
@@ -119,6 +124,9 @@ void MX_FREERTOS_Init(void) {
   /* Create the mutex(es) */
   /* creation of sensorDataMutex */
   sensorDataMutexHandle = osMutexNew(&sensorDataMutex_attributes);
+
+  /* creation of uartLogMutex */
+  uartLogMutexHandle = osMutexNew(&uartLogMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -276,9 +284,11 @@ void StartMethaneSensorTask(void *argument)
 			sharedSensorData.methaneValid = pdTRUE;
 			osMutexRelease(sensorDataMutexHandle);
 #if DEBUG_UART_LOGGING
+			osMutexAcquire(uartLogMutexHandle, osWaitForever);
 			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CH4 raw=%u tick=%lu\r\n",
                              methaneValue, (unsigned long)xLastWakeTime);
 			HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+			osMutexRelease(uartLogMutexHandle);
 #endif
 			if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
 			{
@@ -307,10 +317,52 @@ void StartMethaneSensorTask(void *argument)
 void StartCOSensorTask(void *argument)
 {
   /* USER CODE BEGIN StartCOSensorTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+	TickType_t xLastWakeTime;
+	const TickType_t xPeriod = pdMS_TO_TICKS(150);
+	uint16_t coValue;
+	BaseType_t bConversionOk;
+
+#if DEBUG_UART_LOGGING
+	char dbgBuf[64];
+	int  dbgLen;
+#endif
+
+	ADC_HW_StartConversion(&hadc2);
+
+	xLastWakeTime = xTaskGetTickCount();
+	for (;;)
+	{
+	  vTaskDelayUntil(&xLastWakeTime, xPeriod);
+
+	  bConversionOk = ADC_HW_ReadValue(&hadc2, &coValue);
+	  ADC_HW_StartConversion(&hadc2);
+
+	  if (bConversionOk)
+	  {
+		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+		  sharedSensorData.coLevel = coValue;
+		  sharedSensorData.coValid = pdTRUE;
+		  osMutexRelease(sensorDataMutexHandle);
+
+#if DEBUG_UART_LOGGING
+		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
+		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CO raw=%u tick=%lu\r\n",
+							 coValue, (unsigned long)xLastWakeTime);
+		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+		  osMutexRelease(uartLogMutexHandle);
+#endif
+
+		  if (coValue >= CO_CRITICAL_THRESHOLD)
+		  {
+			  // osSemaphoreRelease(alarmEventSemaphoreHandle); turn alarm on
+		  }
+	  }
+	  else
+	  {
+		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+		  sharedSensorData.coValid = pdFALSE;
+		  osMutexRelease(sensorDataMutexHandle);
+	  }
   }
   /* USER CODE END StartCOSensorTask */
 }
