@@ -27,6 +27,8 @@
 /* USER CODE BEGIN Includes */
 #include "usart.h"
 #include <string.h>
+#include <stdio.h>
+#include "sensor_adc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +48,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+#define DEBUG_UART_LOGGING   1
+SharedSensorData_t sharedSensorData;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -62,10 +65,29 @@ const osThreadAttr_t WaterLevelTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for MethaneSensorTa */
+osThreadId_t MethaneSensorTaHandle;
+const osThreadAttr_t MethaneSensorTa_attributes = {
+  .name = "MethaneSensorTa",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow6,
+};
+/* Definitions for COSensorTask */
+osThreadId_t COSensorTaskHandle;
+const osThreadAttr_t COSensorTask_attributes = {
+  .name = "COSensorTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow5,
+};
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
   .name = "pumpCommandQueue"
+};
+/* Definitions for sensorDataMutex */
+osMutexId_t sensorDataMutexHandle;
+const osMutexAttr_t sensorDataMutex_attributes = {
+  .name = "sensorDataMutex"
 };
 /* Definitions for waterLevelSemaphore */
 osSemaphoreId_t waterLevelSemaphoreHandle;
@@ -80,6 +102,8 @@ const osSemaphoreAttr_t waterLevelSemaphore_attributes = {
 
 void StartDefaultTask(void *argument);
 void StartWaterLevelTask(void *argument);
+void StartMethaneSensorTask(void *argument);
+void StartCOSensorTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -92,6 +116,9 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* creation of sensorDataMutex */
+  sensorDataMutexHandle = osMutexNew(&sensorDataMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -123,6 +150,12 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of WaterLevelTask */
   WaterLevelTaskHandle = osThreadNew(StartWaterLevelTask, NULL, &WaterLevelTask_attributes);
+
+  /* creation of MethaneSensorTa */
+  MethaneSensorTaHandle = osThreadNew(StartMethaneSensorTask, NULL, &MethaneSensorTa_attributes);
+
+  /* creation of COSensorTask */
+  COSensorTaskHandle = osThreadNew(StartCOSensorTask, NULL, &COSensorTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -198,5 +231,91 @@ void StartWaterLevelTask(void *argument)
   /* USER CODE END StartWaterLevelTask */
 }
 
+/* USER CODE BEGIN Header_StartMethaneSensorTask */
+/**
+* @brief Function implementing the MethaneSensorTa thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMethaneSensorTask */
+void StartMethaneSensorTask(void *argument)
+{
+  /* USER CODE BEGIN StartMethaneSensorTask */
+	TickType_t xLastWakeTime;
+	const TickType_t xPeriod = pdMS_TO_TICKS(150);
+	uint16_t methaneValue;
+	BaseType_t bConversionOk;
+#if DEBUG_UART_LOGGING
+	char dbgBuf[64];
+	int  dbgLen;
+#endif
+	/* Prime the pipeline: kick off the very first conversion before
+	   the periodic loop starts, so period 1's read has something
+	   to read. */
+	ADC_HW_StartConversion(&hadc1);
+
+	xLastWakeTime = xTaskGetTickCount();
+  /* Infinite loop */
+	for (;;)
+	{
+		vTaskDelayUntil(&xLastWakeTime, xPeriod);
+
+		/* This conversion was started >=150 ms ago (max latency is
+		   50 ms) -> guaranteed complete. No polling needed for EOC;
+		   SR is only consulted for the error bit. */
+		bConversionOk = ADC_HW_ReadValue(&hadc1, &methaneValue);
+
+		/* Immediately displace: start the conversion this reading's
+		   "successor" will consume next period. */
+		ADC_HW_StartConversion(&hadc1);
+
+		if (bConversionOk)
+		{
+			osMutexAcquire(sensorDataMutexHandle, portMAX_DELAY);
+			sharedSensorData.methaneLevel = methaneValue;
+			sharedSensorData.methaneValid = pdTRUE;
+			osMutexRelease(sensorDataMutexHandle);
+#if DEBUG_UART_LOGGING
+			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CH4 raw=%u tick=%lu\r\n",
+                             methaneValue, (unsigned long)xLastWakeTime);
+			HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+#endif
+			if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
+			{
+				// xSemaphoreGive(alarmEventSemaphore); turn alarm on
+			}
+		}
+		else
+		{
+			/* device signaled an error in its status register —
+			   feed into your "one bad reading tolerated" logic here */
+			osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+			sharedSensorData.methaneValid = pdFALSE;
+			osMutexRelease(sensorDataMutexHandle);
+		}
+	}
+  /* USER CODE END StartMethaneSensorTask */
+}
+
+/* USER CODE BEGIN Header_StartCOSensorTask */
+/**
+* @brief Function implementing the COSensorTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartCOSensorTask */
+void StartCOSensorTask(void *argument)
+{
+  /* USER CODE BEGIN StartCOSensorTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartCOSensorTask */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+/* USER CODE END Application */
+

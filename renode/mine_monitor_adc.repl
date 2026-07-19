@@ -1,0 +1,2 @@
+adc1: Analog.STM32_ADC @ sysbus 0x40012000
+    IRQ -> nvic@18

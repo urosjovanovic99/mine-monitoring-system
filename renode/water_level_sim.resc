@@ -14,6 +14,7 @@ mach create "NUCLEO-F446RE"
 # water-level Button peripherals wired to PC0/PC1 (see water_level_renode.repl
 # for what's added on top and why).
 machine LoadPlatformDescription @renode/water_level_renode.repl
+machine LoadPlatformDescription @renode/mine_monitor_adc.repl
 
 # ── UART -> host terminal ──────────────────────────────────────────────────────
 # Everything your firmware writes to USART2 appears here.
