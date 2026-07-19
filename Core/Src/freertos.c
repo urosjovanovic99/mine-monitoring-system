@@ -65,10 +65,10 @@ const osThreadAttr_t WaterLevelTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for MethaneSensorTa */
-osThreadId_t MethaneSensorTaHandle;
-const osThreadAttr_t MethaneSensorTa_attributes = {
-  .name = "MethaneSensorTa",
+/* Definitions for MethaneTask */
+osThreadId_t MethaneTaskHandle;
+const osThreadAttr_t MethaneTask_attributes = {
+  .name = "MethaneTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow6,
 };
@@ -78,6 +78,13 @@ const osThreadAttr_t COSensorTask_attributes = {
   .name = "COSensorTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow5,
+};
+/* Definitions for AirFlowTask */
+osThreadId_t AirFlowTaskHandle;
+const osThreadAttr_t AirFlowTask_attributes = {
+  .name = "AirFlowTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow4,
 };
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
@@ -109,6 +116,7 @@ void StartDefaultTask(void *argument);
 void StartWaterLevelTask(void *argument);
 void StartMethaneSensorTask(void *argument);
 void StartCOSensorTask(void *argument);
+void StartAirFlowSensorTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -159,11 +167,14 @@ void MX_FREERTOS_Init(void) {
   /* creation of WaterLevelTask */
   WaterLevelTaskHandle = osThreadNew(StartWaterLevelTask, NULL, &WaterLevelTask_attributes);
 
-  /* creation of MethaneSensorTa */
-  MethaneSensorTaHandle = osThreadNew(StartMethaneSensorTask, NULL, &MethaneSensorTa_attributes);
+  /* creation of MethaneTask */
+  MethaneTaskHandle = osThreadNew(StartMethaneSensorTask, NULL, &MethaneTask_attributes);
 
   /* creation of COSensorTask */
   COSensorTaskHandle = osThreadNew(StartCOSensorTask, NULL, &COSensorTask_attributes);
+
+  /* creation of AirFlowTask */
+  AirFlowTaskHandle = osThreadNew(StartAirFlowSensorTask, NULL, &AirFlowTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -365,6 +376,90 @@ void StartCOSensorTask(void *argument)
 	  }
   }
   /* USER CODE END StartCOSensorTask */
+}
+
+/* USER CODE BEGIN Header_StartAirFlowSensorTask */
+/**
+* @brief Function implementing the AirFlowSensorTa thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartAirFlowSensorTask */
+void StartAirFlowSensorTask(void *argument)
+{
+  /* USER CODE BEGIN StartAirFlowSensorTask */
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  uint16_t airFlowValue;
+  BaseType_t bConversionOk;
+  uint8_t consecutiveErrors = 0;
+
+#if DEBUG_UART_LOGGING
+  char dbgBuf[64];
+  int  dbgLen;
+#endif
+
+  ADC_HW_StartConversion(&hadc3);
+
+  xLastWakeTime = xTaskGetTickCount();
+  for (;;)
+  {
+	  vTaskDelayUntil(&xLastWakeTime, xPeriod);
+
+	  bConversionOk = ADC_HW_ReadValue(&hadc3, &airFlowValue);
+	  ADC_HW_StartConversion(&hadc3);
+
+	  if (bConversionOk)
+	  {
+		  consecutiveErrors = 0;
+
+		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+		  sharedSensorData.airFlowLevel = airFlowValue;
+		  sharedSensorData.airFlowValid = pdTRUE;
+		  osMutexRelease(sensorDataMutexHandle);
+
+#if DEBUG_UART_LOGGING
+		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
+		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW raw=%u tick=%lu\r\n",
+							 airFlowValue, (unsigned long)xLastWakeTime);
+		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+		  osMutexRelease(uartLogMutexHandle);
+#endif
+
+		  /* Air flow alarms on too LOW a reading, not too high -
+			 insufficient ventilation is the fault condition here. */
+		  if (airFlowValue <= AIRFLOW_LOW_THRESHOLD)
+		  {
+			  // osSemaphoreRelease(alarmEventSemaphoreHandle); alarm should turn on
+		  }
+	  }
+	  else
+	  {   // error recovery still have to analyze this part of code
+		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+		  sharedSensorData.airFlowValid = pdFALSE;
+		  osMutexRelease(sensorDataMutexHandle);
+
+		  if (consecutiveErrors < 0xFF)  /* guard against wraparound */
+		  {
+			  consecutiveErrors++;
+		  }
+
+		  /* Spec requirement: 2 consecutive read errors -> alarm */
+		  if (consecutiveErrors >= 2)
+		  {
+			  // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+		  }
+
+#if DEBUG_UART_LOGGING
+		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
+		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW ERROR (%u consecutive) tick=%lu\r\n",
+							 consecutiveErrors, (unsigned long)xLastWakeTime);
+		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+		  osMutexRelease(uartLogMutexHandle);
+#endif
+	      }
+	  }
+  /* USER CODE END StartAirFlowSensorTask */
 }
 
 /* Private application code --------------------------------------------------*/
