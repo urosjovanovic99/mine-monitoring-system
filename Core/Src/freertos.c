@@ -63,7 +63,7 @@ osThreadId_t WaterLevelTaskHandle;
 const osThreadAttr_t WaterLevelTask_attributes = {
   .name = "WaterLevelTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityLow3,
 };
 /* Definitions for MethaneTask */
 osThreadId_t MethaneTaskHandle;
