@@ -25,10 +25,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usart.h"
-#include <string.h>
-#include <stdio.h>
-#include "sensor_adc.h"
+#include "freertos_shared.h"
+#include "task_water_level.h"
+#include "task_methane.h"
+#include "task_co_sensor.h"
+#include "task_airflow.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +49,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-#define DEBUG_UART_LOGGING   1
+/* Definition lives here because MX_FREERTOS_Init() and the RTOS object
+ * handles below are CubeMX-owned; every task file pulls this in via
+ * freertos_shared.h (extern SharedSensorData_t sharedSensorData;). */
 SharedSensorData_t sharedSensorData;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -214,39 +217,7 @@ void StartDefaultTask(void *argument)
 void StartWaterLevelTask(void *argument)
 {
   /* USER CODE BEGIN StartWaterLevelTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    if (osSemaphoreAcquire(waterLevelSemaphoreHandle, osWaitForever) == osOK)
-    {
-      GPIO_PinState highSet = HAL_GPIO_ReadPin(HIGH_WATER_GPIO_Port, HIGH_WATER_Pin);
-      GPIO_PinState lowSet  = HAL_GPIO_ReadPin(LOW_WATER_GPIO_Port, LOW_WATER_Pin);
-
-      WaterLevelEvent_t evt;
-      const char *msg;
-      if (highSet == GPIO_PIN_SET)
-      {
-        evt = WATER_LEVEL_HIGH;
-        msg = "WaterLevelTask: HIGH -> pump ON\r\n";
-      }
-      else if (lowSet == GPIO_PIN_SET)
-      {
-        evt = WATER_LEVEL_LOW;
-        msg = "WaterLevelTask: LOW -> pump OFF\r\n";
-      }
-      else
-      {
-        evt = WATER_LEVEL_NORMAL;
-        msg = "WaterLevelTask: NORMAL (no action)\r\n";
-      }
-
-      /* TEMPORARY test-only output so the EXTI->task path is observable in
-       * Renode. Remove or move into UICommsTask once real JSON telemetry is back. */
-      HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
-
-      osMessageQueuePut(pumpCommandQueueHandle, &evt, 0, 0);
-    }
-  }
+  WaterLevelTask_Run(argument);
   /* USER CODE END StartWaterLevelTask */
 }
 
@@ -260,61 +231,7 @@ void StartWaterLevelTask(void *argument)
 void StartMethaneSensorTask(void *argument)
 {
   /* USER CODE BEGIN StartMethaneSensorTask */
-	TickType_t xLastWakeTime;
-	const TickType_t xPeriod = pdMS_TO_TICKS(150);
-	uint16_t methaneValue;
-	BaseType_t bConversionOk;
-#if DEBUG_UART_LOGGING
-	char dbgBuf[64];
-	int  dbgLen;
-#endif
-	/* Prime the pipeline: kick off the very first conversion before
-	   the periodic loop starts, so period 1's read has something
-	   to read. */
-	ADC_HW_StartConversion(&hadc1);
-
-	xLastWakeTime = xTaskGetTickCount();
-  /* Infinite loop */
-	for (;;)
-	{
-		vTaskDelayUntil(&xLastWakeTime, xPeriod);
-
-		/* This conversion was started >=150 ms ago (max latency is
-		   50 ms) -> guaranteed complete. No polling needed for EOC;
-		   SR is only consulted for the error bit. */
-		bConversionOk = ADC_HW_ReadValue(&hadc1, &methaneValue);
-
-		/* Immediately displace: start the conversion this reading's
-		   "successor" will consume next period. */
-		ADC_HW_StartConversion(&hadc1);
-
-		if (bConversionOk)
-		{
-			osMutexAcquire(sensorDataMutexHandle, portMAX_DELAY);
-			sharedSensorData.methaneLevel = methaneValue;
-			sharedSensorData.methaneValid = pdTRUE;
-			osMutexRelease(sensorDataMutexHandle);
-#if DEBUG_UART_LOGGING
-			osMutexAcquire(uartLogMutexHandle, osWaitForever);
-			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CH4 raw=%u tick=%lu\r\n",
-                             methaneValue, (unsigned long)xLastWakeTime);
-			HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-			osMutexRelease(uartLogMutexHandle);
-#endif
-			if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
-			{
-				// xSemaphoreGive(alarmEventSemaphore); turn alarm on
-			}
-		}
-		else
-		{
-			/* device signaled an error in its status register —
-			   feed into your "one bad reading tolerated" logic here */
-			osMutexAcquire(sensorDataMutexHandle, osWaitForever);
-			sharedSensorData.methaneValid = pdFALSE;
-			osMutexRelease(sensorDataMutexHandle);
-		}
-	}
+  MethaneTask_Run(argument);
   /* USER CODE END StartMethaneSensorTask */
 }
 
@@ -328,53 +245,7 @@ void StartMethaneSensorTask(void *argument)
 void StartCOSensorTask(void *argument)
 {
   /* USER CODE BEGIN StartCOSensorTask */
-	TickType_t xLastWakeTime;
-	const TickType_t xPeriod = pdMS_TO_TICKS(150);
-	uint16_t coValue;
-	BaseType_t bConversionOk;
-
-#if DEBUG_UART_LOGGING
-	char dbgBuf[64];
-	int  dbgLen;
-#endif
-
-	ADC_HW_StartConversion(&hadc2);
-
-	xLastWakeTime = xTaskGetTickCount();
-	for (;;)
-	{
-	  vTaskDelayUntil(&xLastWakeTime, xPeriod);
-
-	  bConversionOk = ADC_HW_ReadValue(&hadc2, &coValue);
-	  ADC_HW_StartConversion(&hadc2);
-
-	  if (bConversionOk)
-	  {
-		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
-		  sharedSensorData.coLevel = coValue;
-		  sharedSensorData.coValid = pdTRUE;
-		  osMutexRelease(sensorDataMutexHandle);
-
-#if DEBUG_UART_LOGGING
-		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
-		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CO raw=%u tick=%lu\r\n",
-							 coValue, (unsigned long)xLastWakeTime);
-		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-		  osMutexRelease(uartLogMutexHandle);
-#endif
-
-		  if (coValue >= CO_CRITICAL_THRESHOLD)
-		  {
-			  // osSemaphoreRelease(alarmEventSemaphoreHandle); turn alarm on
-		  }
-	  }
-	  else
-	  {
-		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
-		  sharedSensorData.coValid = pdFALSE;
-		  osMutexRelease(sensorDataMutexHandle);
-	  }
-  }
+  COSensorTask_Run(argument);
   /* USER CODE END StartCOSensorTask */
 }
 
@@ -388,77 +259,7 @@ void StartCOSensorTask(void *argument)
 void StartAirFlowSensorTask(void *argument)
 {
   /* USER CODE BEGIN StartAirFlowSensorTask */
-  TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
-  uint16_t airFlowValue;
-  BaseType_t bConversionOk;
-  uint8_t consecutiveErrors = 0;
-
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
-
-  ADC_HW_StartConversion(&hadc3);
-
-  xLastWakeTime = xTaskGetTickCount();
-  for (;;)
-  {
-	  vTaskDelayUntil(&xLastWakeTime, xPeriod);
-
-	  bConversionOk = ADC_HW_ReadValue(&hadc3, &airFlowValue);
-	  ADC_HW_StartConversion(&hadc3);
-
-	  if (bConversionOk)
-	  {
-		  consecutiveErrors = 0;
-
-		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
-		  sharedSensorData.airFlowLevel = airFlowValue;
-		  sharedSensorData.airFlowValid = pdTRUE;
-		  osMutexRelease(sensorDataMutexHandle);
-
-#if DEBUG_UART_LOGGING
-		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
-		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW raw=%u tick=%lu\r\n",
-							 airFlowValue, (unsigned long)xLastWakeTime);
-		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-		  osMutexRelease(uartLogMutexHandle);
-#endif
-
-		  /* Air flow alarms on too LOW a reading, not too high -
-			 insufficient ventilation is the fault condition here. */
-		  if (airFlowValue <= AIRFLOW_LOW_THRESHOLD)
-		  {
-			  // osSemaphoreRelease(alarmEventSemaphoreHandle); alarm should turn on
-		  }
-	  }
-	  else
-	  {   // error recovery still have to analyze this part of code
-		  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
-		  sharedSensorData.airFlowValid = pdFALSE;
-		  osMutexRelease(sensorDataMutexHandle);
-
-		  if (consecutiveErrors < 0xFF)  /* guard against wraparound */
-		  {
-			  consecutiveErrors++;
-		  }
-
-		  /* Spec requirement: 2 consecutive read errors -> alarm */
-		  if (consecutiveErrors >= 2)
-		  {
-			  // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
-		  }
-
-#if DEBUG_UART_LOGGING
-		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
-		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW ERROR (%u consecutive) tick=%lu\r\n",
-							 consecutiveErrors, (unsigned long)xLastWakeTime);
-		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-		  osMutexRelease(uartLogMutexHandle);
-#endif
-	      }
-	  }
+  AirFlowTask_Run(argument);
   /* USER CODE END StartAirFlowSensorTask */
 }
 

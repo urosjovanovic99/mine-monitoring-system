@@ -1,0 +1,88 @@
+/*
+ * task_airflow.c
+ *
+ *  Created on: Jul 19, 2026
+ *      Author: uros.jovanovic
+ */
+
+#include "task_airflow.h"
+#include "freertos_shared.h"
+#include "sensor_adc.h"
+#include "usart.h"
+#include "cmsis_os.h"
+#include <stdio.h>
+
+void AirFlowTask_Run(void *argument)
+{
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  uint16_t airFlowValue;
+  BaseType_t bConversionOk;
+  uint8_t consecutiveErrors = 0;
+
+#if DEBUG_UART_LOGGING
+  char dbgBuf[64];
+  int  dbgLen;
+#endif
+
+  ADC_HW_StartConversion(&hadc3);
+
+  xLastWakeTime = xTaskGetTickCount();
+  for (;;)
+  {
+    vTaskDelayUntil(&xLastWakeTime, xPeriod);
+
+    bConversionOk = ADC_HW_ReadValue(&hadc3, &airFlowValue);
+    ADC_HW_StartConversion(&hadc3);
+
+    if (bConversionOk)
+    {
+      consecutiveErrors = 0;
+
+      osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+      sharedSensorData.airFlowLevel = airFlowValue;
+      sharedSensorData.airFlowValid = pdTRUE;
+      osMutexRelease(sensorDataMutexHandle);
+
+#if DEBUG_UART_LOGGING
+      osMutexAcquire(uartLogMutexHandle, osWaitForever);
+      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW raw=%u tick=%lu\r\n",
+                         airFlowValue, (unsigned long)xLastWakeTime);
+      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+      osMutexRelease(uartLogMutexHandle);
+#endif
+
+      /* Air flow alarms on too LOW a reading, not too high -
+         insufficient ventilation is the fault condition here. */
+      if (airFlowValue <= AIRFLOW_LOW_THRESHOLD)
+      {
+        // osSemaphoreRelease(alarmEventSemaphoreHandle); alarm should turn on
+      }
+    }
+    else
+    {   // error recovery still have to analyze this part of code
+      osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+      sharedSensorData.airFlowValid = pdFALSE;
+      osMutexRelease(sensorDataMutexHandle);
+
+      if (consecutiveErrors < 0xFF)  /* guard against wraparound */
+      {
+        consecutiveErrors++;
+      }
+
+      /* Spec requirement: 2 consecutive read errors -> alarm */
+      if (consecutiveErrors >= 2)
+      {
+        // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+      }
+
+#if DEBUG_UART_LOGGING
+      osMutexAcquire(uartLogMutexHandle, osWaitForever);
+      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW ERROR (%u consecutive) tick=%lu\r\n",
+                         consecutiveErrors, (unsigned long)xLastWakeTime);
+      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+      osMutexRelease(uartLogMutexHandle);
+#endif
+    }
+  }
+}

@@ -1,6 +1,6 @@
-../Core/Src/freertos.c:128:6:MX_FREERTOS_Init	1
-../Core/Src/freertos.c:196:6:StartDefaultTask	1
-../Core/Src/freertos.c:214:6:StartWaterLevelTask	4
-../Core/Src/freertos.c:260:6:StartMethaneSensorTask	2
-../Core/Src/freertos.c:328:6:StartCOSensorTask	2
-../Core/Src/freertos.c:388:6:StartAirFlowSensorTask	3
+../Core/Src/freertos.c:131:6:MX_FREERTOS_Init	1
+../Core/Src/freertos.c:199:6:StartDefaultTask	1
+../Core/Src/freertos.c:217:6:StartWaterLevelTask	1
+../Core/Src/freertos.c:231:6:StartMethaneSensorTask	1
+../Core/Src/freertos.c:245:6:StartCOSensorTask	1
+../Core/Src/freertos.c:259:6:StartAirFlowSensorTask	1
