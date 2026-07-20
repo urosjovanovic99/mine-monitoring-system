@@ -30,6 +30,7 @@
 #include "task_methane.h"
 #include "task_co_sensor.h"
 #include "task_airflow.h"
+#include "task_pump_flow.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +54,7 @@
  * handles below are CubeMX-owned; every task file pulls this in via
  * freertos_shared.h (extern SharedSensorData_t sharedSensorData;). */
 SharedSensorData_t sharedSensorData;
+PumpState_t pumpCommandedState = PUMP_OFF;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -73,7 +75,7 @@ osThreadId_t MethaneTaskHandle;
 const osThreadAttr_t MethaneTask_attributes = {
   .name = "MethaneTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow6,
+  .priority = (osPriority_t) osPriorityLow7,
 };
 /* Definitions for COSensorTask */
 osThreadId_t COSensorTaskHandle;
@@ -89,6 +91,13 @@ const osThreadAttr_t AirFlowTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow4,
 };
+/* Definitions for PumpFlowTask */
+osThreadId_t PumpFlowTaskHandle;
+const osThreadAttr_t PumpFlowTask_attributes = {
+  .name = "PumpFlowTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow6,
+};
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
@@ -103,6 +112,11 @@ const osMutexAttr_t sensorDataMutex_attributes = {
 osMutexId_t uartLogMutexHandle;
 const osMutexAttr_t uartLogMutex_attributes = {
   .name = "uartLogMutex"
+};
+/* Definitions for pumpMutex */
+osMutexId_t pumpMutexHandle;
+const osMutexAttr_t pumpMutex_attributes = {
+  .name = "pumpMutex"
 };
 /* Definitions for waterLevelSemaphore */
 osSemaphoreId_t waterLevelSemaphoreHandle;
@@ -120,6 +134,7 @@ void StartWaterLevelTask(void *argument);
 void StartMethaneSensorTask(void *argument);
 void StartCOSensorTask(void *argument);
 void StartAirFlowSensorTask(void *argument);
+void StartPumpFlowTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -138,6 +153,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of uartLogMutex */
   uartLogMutexHandle = osMutexNew(&uartLogMutex_attributes);
+
+  /* creation of pumpMutex */
+  pumpMutexHandle = osMutexNew(&pumpMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -178,6 +196,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of AirFlowTask */
   AirFlowTaskHandle = osThreadNew(StartAirFlowSensorTask, NULL, &AirFlowTask_attributes);
+
+  /* creation of PumpFlowTask */
+  PumpFlowTaskHandle = osThreadNew(StartPumpFlowTask, NULL, &PumpFlowTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -261,6 +282,20 @@ void StartAirFlowSensorTask(void *argument)
   /* USER CODE BEGIN StartAirFlowSensorTask */
   AirFlowTask_Run(argument);
   /* USER CODE END StartAirFlowSensorTask */
+}
+
+/* USER CODE BEGIN Header_StartPumpFlowTask */
+/**
+* @brief Function implementing the PumpFlowTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPumpFlowTask */
+void StartPumpFlowTask(void *argument)
+{
+  /* USER CODE BEGIN StartPumpFlowTask */
+  PumpFlowTask_Run(argument);
+  /* USER CODE END StartPumpFlowTask */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -11,10 +11,6 @@
 #include "adc.h"
 #include "FreeRTOS.h"
 
-#define METHANE_CRITICAL_THRESHOLD 1000
-#define CO_CRITICAL_THRESHOLD 1000
-#define AIRFLOW_LOW_THRESHOLD 1000
-
 /* USER CODE BEGIN Variables */
 typedef struct
 {

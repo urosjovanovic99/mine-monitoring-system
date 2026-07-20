@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define AIRFLOW_LOW_THRESHOLD 1000
+
 /**
  * @brief  Body of AirFlowTask. Called from StartAirFlowSensorTask() in
  *         freertos.c.

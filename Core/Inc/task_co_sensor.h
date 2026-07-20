@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+#define CO_CRITICAL_THRESHOLD 1000
 /**
  * @brief  Body of COSensorTask. Called from StartCOSensorTask() in
  *         freertos.c.

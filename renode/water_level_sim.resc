@@ -1,27 +1,10 @@
-################################################################################
-#  Renode script — NUCLEO-F446RE mine monitoring + water level simulation
-#  Built directly on your confirmed-working nucleo_f446re_counter.resc,
-#  with the water-level Button peripherals from water_level_renode.repl added.
-#
-#  Usage: cd into the project folder first, then from the Monitor:
-#      i @renode/water_level_sim.resc
-################################################################################
-
-# ── Machine ──────────────────────────────────────────────────────────────────
 mach create "NUCLEO-F446RE"
 
-# Same board-level platform you already confirmed works, plus our two
-# water-level Button peripherals wired to PC0/PC1 (see water_level_renode.repl
-# for what's added on top and why).
 machine LoadPlatformDescription @renode/water_level_renode.repl
 machine LoadPlatformDescription @renode/mine_monitor_adc.repl
 
-# ── UART -> host terminal ──────────────────────────────────────────────────────
-# Everything your firmware writes to USART2 appears here.
 showAnalyzer sysbus.usart2
 
-# ── ELF image ─────────────────────────────────────────────────────────────────
-# EDIT THIS to your current project's actual Debug output path.
 macro reset
 """
     sysbus LoadELF @Debug/mine-monitoring-system.elf
@@ -29,16 +12,4 @@ macro reset
 
 runMacro $reset
 
-# ── Start ─────────────────────────────────────────────────────────────────────
-# Runs continuously from here -- do NOT also use `emulation RunFor` after this,
-# the two are mutually exclusive (RunFor is for a paused emulation, and start
-# leaves it running continuously). Once started, just type stimulus commands
-# directly in the Monitor whenever you want them, e.g.:
-#
-#   sysbus.gpioPortC.highWaterButton Press
-#   sysbus.gpioPortC.highWaterButton Release
-#   sysbus.gpioPortC.lowWaterButton Press
-#   sysbus.gpioPortC.lowWaterButton Release
-#
-# and watch the USART2 analyzer window for the pump-on/pump-off JSON messages.
 start

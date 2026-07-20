@@ -1,35 +1,5 @@
-// =============================================================================
-// water_level_renode.repl — platform overlay for the mine monitoring project,
-// built on top of YOUR confirmed-working base: platforms/boards/
-// stm32f4_discovery-kit.repl (from nucleo_f446re_counter.resc, which you
-// verified produces working USART2 JSON output + LD2 heartbeat).
-//
-// Earlier version of this file used "using platforms/cpus/stm32f4.repl"
-// (the bare CPU file, no board-level setup) instead of the board file you'd
-// actually confirmed working -- that swap is the most likely cause of USART2
-// going silent, independent of anything water-level related. Reverted here.
-//
-// NOTE: .repl files use C-style // comments, not # (an earlier version used
-// # and Renode's parser rejected it outright at line 1 -- confirmed by
-// inspecting real shipped .repl files, which use // throughout). This is
-// different from .resc Monitor scripts, which DO accept # -- two different
-// parsers/formats.
-// =============================================================================
-
 using "platforms/boards/stm32f4_discovery-kit.repl"
 
-// -----------------------------------------------------------------------
-// External-stimulus Button peripherals for the two water level sensors.
-// This is Renode's verified, standard idiom for injecting an external
-// digital event (confirmed against the real stm32f4_discovery.repl, which
-// wires its own UserButton the same way). A Button's Press/Release goes
-// through the normal OnGPIO() codepath into the port, which correctly sets
-// the real EXTI pending bit (EXTI_PR) exactly like genuine silicon -- this
-// is what reliably invokes HAL_GPIO_EXTI_IRQHandler/HAL_GPIO_EXTI_Callback.
-//
-// No firmware changes needed: PC0/PC1 stay configured in CubeMX exactly as
-// real EXTI inputs (GPIO_EXTI_RISING_FALLING), same as on real hardware.
-// -----------------------------------------------------------------------
 highWaterButton: Miscellaneous.Button @ gpioPortC
     -> gpioPortC@0
     // add "invert: true" here if your high-level switch is active-low
@@ -38,21 +8,6 @@ lowWaterButton: Miscellaneous.Button @ gpioPortC
     -> gpioPortC@1
     // add "invert: true" here if your low-level switch is active-low
 
-// -----------------------------------------------------------------------
-// ALTERNATIVE (commented out): firmware-driven loopback, for triggering the
-// event from your own code (e.g. a UART command from the PyQt5 dashboard)
-// instead of the Renode Monitor. Mutually exclusive with the buttons above
-// -- comment those out if you switch to this.
-//
-// PB0/PB1 chosen instead of PA5/PA6: PA5 is your LD2 heartbeat pin, so
-// reusing it here would conflict with the working base project.
-//
-// Do NOT use EXTI_SWIER (LL_EXTI_GenerateSWI / raw EXTI->SWIER register) as
-// a shortcut instead of this wiring: Renode's STM32F4_EXTI model asserts
-// the NVIC line on a SWIER write but never sets EXTI_PR, so HAL's generated
-// IRQ handler (which gates the callback on reading EXTI_PR) silently drops
-// it. The loopback wiring below is a real net-level signal and has no such
-// gap.
-// -----------------------------------------------------------------------
-// gpioPortB@0 -> gpioPortC@0   // PB0 (firmware output) drives HIGH_WATER_Pin
-// gpioPortB@1 -> gpioPortC@1   // PB1 (firmware output) drives LOW_WATER_Pin
+waterFlowSwitch: Miscellaneous.Button @ gpioPortB
+    -> gpioPortB@1
+    // add "invert: true" here if your high-level switch is active-low
