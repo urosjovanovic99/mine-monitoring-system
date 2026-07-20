@@ -6,6 +6,7 @@
  */
 
 #include "task_airflow.h"
+#include "task_alarm_manager.h"
 #include "freertos_shared.h"
 #include "sensor_adc.h"
 #include "usart.h"
@@ -56,7 +57,7 @@ void AirFlowTask_Run(void *argument)
          insufficient ventilation is the fault condition here. */
       if (airFlowValue <= AIRFLOW_LOW_THRESHOLD)
       {
-        // osSemaphoreRelease(alarmEventSemaphoreHandle); alarm should turn on
+        AlarmManager_RaiseCause(ALARM_BIT_AIRFLOW);
       }
     }
     else
@@ -73,7 +74,7 @@ void AirFlowTask_Run(void *argument)
       /* Spec requirement: 2 consecutive read errors -> alarm */
       if (consecutiveErrors >= 2)
       {
-        // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+        AlarmManager_RaiseCause(ALARM_BIT_AIRFLOW);
       }
 
 #if DEBUG_UART_LOGGING

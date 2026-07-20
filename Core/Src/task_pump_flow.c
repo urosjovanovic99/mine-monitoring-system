@@ -6,6 +6,7 @@
  */
 
 #include "task_pump_flow.h"
+#include "task_alarm_manager.h"
 #include "freertos_shared.h"
 #include "task_pump_manager.h"
 #include "usart.h"
@@ -63,7 +64,7 @@ void PumpFlowTask_Run(void *argument)
 
               if (mismatch)
               {
-                  // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+                  AlarmManager_RaiseCause(ALARM_BIT_PUMPFAULT);
 #if DEBUG_UART_LOGGING
                   osMutexAcquire(uartLogMutexHandle, osWaitForever);
                   dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
@@ -102,7 +103,7 @@ void PumpFlowTask_Run(void *argument)
 #endif
           if (mismatch)
           {
-              // osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+              AlarmManager_RaiseCause(ALARM_BIT_PUMPFAULT);
           }
       }
   }

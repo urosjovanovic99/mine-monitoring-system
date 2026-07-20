@@ -6,6 +6,7 @@
  */
 
 #include "task_methane.h"
+#include "task_alarm_manager.h"
 #include "freertos_shared.h"
 #include "sensor_adc.h"
 #include "usart.h"
@@ -18,6 +19,7 @@ void MethaneTask_Run(void *argument)
   const TickType_t xPeriod = pdMS_TO_TICKS(150);
   uint16_t methaneValue;
   BaseType_t bConversionOk;
+  uint8_t consecutiveErrors = 0;
 #if DEBUG_UART_LOGGING
   char dbgBuf[64];
   int  dbgLen;
@@ -44,6 +46,8 @@ void MethaneTask_Run(void *argument)
 
     if (bConversionOk)
     {
+      consecutiveErrors = 0;
+
       osMutexAcquire(sensorDataMutexHandle, portMAX_DELAY);
       sharedSensorData.methaneLevel = methaneValue;
       sharedSensorData.methaneValid = pdTRUE;
@@ -57,16 +61,26 @@ void MethaneTask_Run(void *argument)
 #endif
       if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
       {
-        // xSemaphoreGive(alarmEventSemaphore); turn alarm on
+        AlarmManager_RaiseCause(ALARM_BIT_METHANE);
       }
     }
     else
     {
-      /* device signaled an error in its status register —
-         feed into your "one bad reading tolerated" logic here */
+      /* device signaled an error in its status register */
       osMutexAcquire(sensorDataMutexHandle, osWaitForever);
       sharedSensorData.methaneValid = pdFALSE;
       osMutexRelease(sensorDataMutexHandle);
+
+      if (consecutiveErrors < 0xFF)  /* guard against wraparound */
+      {
+        consecutiveErrors++;
+      }
+
+      /* Spec requirement: 2 consecutive read errors -> alarm */
+      if (consecutiveErrors >= 2)
+      {
+        AlarmManager_RaiseCause(ALARM_BIT_METHANE);
+      }
     }
   }
 }

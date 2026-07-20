@@ -10,6 +10,7 @@
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32f4xx.o"
 "./Core/Src/task_airflow.o"
+"./Core/Src/task_alarm_manager.o"
 "./Core/Src/task_co_sensor.o"
 "./Core/Src/task_methane.o"
 "./Core/Src/task_pump_flow.o"

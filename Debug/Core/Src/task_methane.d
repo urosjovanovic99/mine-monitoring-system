@@ -1,5 +1,6 @@
 Core/Src/task_methane.o: ../Core/Src/task_methane.c \
- ../Core/Inc/task_methane.h ../Core/Inc/freertos_shared.h \
+ ../Core/Inc/task_methane.h ../Core/Inc/task_alarm_manager.h \
+ ../Core/Inc/freertos_shared.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
@@ -45,6 +46,7 @@ Core/Src/task_methane.o: ../Core/Src/task_methane.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/sensor_adc.h ../Core/Inc/usart.h
 ../Core/Inc/task_methane.h:
+../Core/Inc/task_alarm_manager.h:
 ../Core/Inc/freertos_shared.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:

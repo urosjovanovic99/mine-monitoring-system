@@ -1,5 +1,6 @@
 Core/Src/task_pump_manager.o: ../Core/Src/task_pump_manager.c \
- ../Core/Inc/task_pump_manager.h ../Core/Inc/freertos_shared.h \
+ ../Core/Inc/task_pump_manager.h ../Core/Inc/task_alarm_manager.h \
+ ../Core/Inc/freertos_shared.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
@@ -46,6 +47,7 @@ Core/Src/task_pump_manager.o: ../Core/Src/task_pump_manager.c \
  ../Core/Inc/task_methane.h ../Core/Inc/task_co_sensor.h \
  ../Core/Inc/task_airflow.h ../Core/Inc/main.h ../Core/Inc/usart.h
 ../Core/Inc/task_pump_manager.h:
+../Core/Inc/task_alarm_manager.h:
 ../Core/Inc/freertos_shared.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:

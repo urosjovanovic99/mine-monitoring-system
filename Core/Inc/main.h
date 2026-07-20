@@ -80,6 +80,8 @@ void Error_Handler(void);
 #define PUMP_GPIO_Port GPIOB
 #define WATER_FLOW_SENSOR_Pin GPIO_PIN_1
 #define WATER_FLOW_SENSOR_GPIO_Port GPIOB
+#define ALARM_Pin GPIO_PIN_2
+#define ALARM_GPIO_Port GPIOB
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14

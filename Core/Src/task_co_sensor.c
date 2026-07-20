@@ -6,6 +6,7 @@
  */
 
 #include "task_co_sensor.h"
+#include "task_alarm_manager.h"
 #include "freertos_shared.h"
 #include "sensor_adc.h"
 #include "usart.h"
@@ -18,6 +19,7 @@ void COSensorTask_Run(void *argument)
   const TickType_t xPeriod = pdMS_TO_TICKS(150);
   uint16_t coValue;
   BaseType_t bConversionOk;
+  uint8_t consecutiveErrors = 0;
 
 #if DEBUG_UART_LOGGING
   char dbgBuf[64];
@@ -36,6 +38,8 @@ void COSensorTask_Run(void *argument)
 
     if (bConversionOk)
     {
+      consecutiveErrors = 0;
+
       osMutexAcquire(sensorDataMutexHandle, osWaitForever);
       sharedSensorData.coLevel = coValue;
       sharedSensorData.coValid = pdTRUE;
@@ -51,7 +55,7 @@ void COSensorTask_Run(void *argument)
 
       if (coValue >= CO_CRITICAL_THRESHOLD)
       {
-        // osSemaphoreRelease(alarmEventSemaphoreHandle); turn alarm on
+        AlarmManager_RaiseCause(ALARM_BIT_CO);
       }
     }
     else
@@ -59,6 +63,17 @@ void COSensorTask_Run(void *argument)
       osMutexAcquire(sensorDataMutexHandle, osWaitForever);
       sharedSensorData.coValid = pdFALSE;
       osMutexRelease(sensorDataMutexHandle);
+
+      if (consecutiveErrors < 0xFF)  /* guard against wraparound */
+      {
+        consecutiveErrors++;
+      }
+
+      /* Spec requirement: 2 consecutive read errors -> alarm */
+      if (consecutiveErrors >= 2)
+      {
+        AlarmManager_RaiseCause(ALARM_BIT_CO);
+      }
     }
   }
 }

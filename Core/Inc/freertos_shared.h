@@ -34,6 +34,7 @@ extern osMutexId_t        uartLogMutexHandle;
 extern osMessageQueueId_t pumpCommandQueueHandle;
 extern osSemaphoreId_t    waterLevelSemaphoreHandle;
 extern osMutexId_t 		  pumpMutexHandle;
+extern osEventFlagsId_t	  alarmEventFlagsHandle;
 
 /* Latest readings from all sensor tasks, guarded by sensorDataMutexHandle. */
 extern SharedSensorData_t sharedSensorData;

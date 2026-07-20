@@ -1,8 +1,9 @@
-../Core/Src/freertos.c:159:6:MX_FREERTOS_Init	8	static
-../Core/Src/freertos.c:239:6:StartDefaultTask	16	static
-../Core/Src/freertos.c:257:6:StartWaterLevelTask	16	static
-../Core/Src/freertos.c:271:6:StartMethaneSensorTask	16	static
-../Core/Src/freertos.c:285:6:StartCOSensorTask	16	static
-../Core/Src/freertos.c:299:6:StartAirFlowSensorTask	16	static
-../Core/Src/freertos.c:313:6:StartPumpFlowTask	16	static
-../Core/Src/freertos.c:327:6:StartPumpManagerTask	16	static
+../Core/Src/freertos.c:168:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:251:6:StartDefaultTask	16	static
+../Core/Src/freertos.c:269:6:StartWaterLevelTask	16	static
+../Core/Src/freertos.c:283:6:StartMethaneSensorTask	16	static
+../Core/Src/freertos.c:297:6:StartCOSensorTask	16	static
+../Core/Src/freertos.c:311:6:StartAirFlowSensorTask	16	static
+../Core/Src/freertos.c:325:6:StartPumpFlowTask	16	static
+../Core/Src/freertos.c:339:6:StartPumpManagerTask	16	static
+../Core/Src/freertos.c:353:6:StartAlarmManageTask	16	static

@@ -32,6 +32,7 @@
 #include "task_airflow.h"
 #include "task_pump_flow.h"
 #include "task_pump_manager.h"
+#include "task_alarm_manager.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +106,13 @@ const osThreadAttr_t PumpManagerTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow2,
 };
+/* Definitions for AlarmManageTask */
+osThreadId_t AlarmManageTaskHandle;
+const osThreadAttr_t AlarmManageTask_attributes = {
+  .name = "AlarmManageTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow1,
+};
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
@@ -130,10 +138,10 @@ osSemaphoreId_t waterLevelSemaphoreHandle;
 const osSemaphoreAttr_t waterLevelSemaphore_attributes = {
   .name = "waterLevelSemaphore"
 };
-/* Definitions for alarmEventSemaphore */
-osSemaphoreId_t alarmEventSemaphoreHandle;
-const osSemaphoreAttr_t alarmEventSemaphore_attributes = {
-  .name = "alarmEventSemaphore"
+/* Definitions for alarmEventFlags */
+osEventFlagsId_t alarmEventFlagsHandle;
+const osEventFlagsAttr_t alarmEventFlags_attributes = {
+  .name = "alarmEventFlags"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -148,6 +156,7 @@ void StartCOSensorTask(void *argument);
 void StartAirFlowSensorTask(void *argument);
 void StartPumpFlowTask(void *argument);
 void StartPumpManagerTask(void *argument);
+void StartAlarmManageTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -177,9 +186,6 @@ void MX_FREERTOS_Init(void) {
   /* Create the semaphores(s) */
   /* creation of waterLevelSemaphore */
   waterLevelSemaphoreHandle = osSemaphoreNew(1, 0, &waterLevelSemaphore_attributes);
-
-  /* creation of alarmEventSemaphore */
-  alarmEventSemaphoreHandle = osSemaphoreNew(1, 0, &alarmEventSemaphore_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -219,9 +225,15 @@ void MX_FREERTOS_Init(void) {
   /* creation of PumpManagerTask */
   PumpManagerTaskHandle = osThreadNew(StartPumpManagerTask, NULL, &PumpManagerTask_attributes);
 
+  /* creation of AlarmManageTask */
+  AlarmManageTaskHandle = osThreadNew(StartAlarmManageTask, NULL, &AlarmManageTask_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* creation of alarmEventFlags */
+  alarmEventFlagsHandle = osEventFlagsNew(&alarmEventFlags_attributes);
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
@@ -329,6 +341,20 @@ void StartPumpManagerTask(void *argument)
   /* USER CODE BEGIN StartPumpManagerTask */
   PumpManagerTask_Run(argument);
   /* USER CODE END StartPumpManagerTask */
+}
+
+/* USER CODE BEGIN Header_StartAlarmManageTask */
+/**
+* @brief Function implementing the AlarmManageTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartAlarmManageTask */
+void StartAlarmManageTask(void *argument)
+{
+  /* USER CODE BEGIN StartAlarmManageTask */
+  AlarmManagerTask_Run(argument);
+  /* USER CODE END StartAlarmManageTask */
 }
 
 /* Private application code --------------------------------------------------*/

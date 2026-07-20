@@ -6,6 +6,7 @@
  */
 
 #include "task_pump_manager.h"
+#include "task_alarm_manager.h"
 #include "freertos_shared.h"
 #include "task_methane.h"
 #include "task_co_sensor.h"
@@ -90,10 +91,15 @@ void PumpManagerTask_Run(void *argument) {
 		  else
 		  {
 		    PumpManager_SetPumpState(PUMP_OFF);
-			// osSemaphoreRelease(alarmEventSemaphoreHandle); turn on alarm
+			/* No alarm raised here on purpose: PumpManager_IsEnvironmentSafe() can
+				   return unsafe either because a sensor is actually critical (that
+				   sensor's own task already called AlarmManager_RaiseCause the
+				   moment it detected it) or because a reading isn't valid yet
+				   (e.g. still warming up), which is not itself an alarm condition.
+				   Duplicating the raise here would risk a false alarm on startup. */
 #if DEBUG_UART_LOGGING
 			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-							   "PumpManagerTask: HIGH but env UNSAFE -> pump OFF, alarm pending (not wired)\r\n");
+							   "PumpManagerTask: HIGH but env UNSAFE -> pump OFF\r\n");
 #endif
 		  }
 		  break;

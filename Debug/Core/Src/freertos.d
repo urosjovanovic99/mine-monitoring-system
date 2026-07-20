@@ -45,7 +45,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/main.h ../Core/Inc/task_water_level.h \
  ../Core/Inc/task_methane.h ../Core/Inc/task_co_sensor.h \
  ../Core/Inc/task_airflow.h ../Core/Inc/task_pump_flow.h \
- ../Core/Inc/task_pump_manager.h
+ ../Core/Inc/task_pump_manager.h ../Core/Inc/task_alarm_manager.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -99,3 +99,4 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/task_airflow.h:
 ../Core/Inc/task_pump_flow.h:
 ../Core/Inc/task_pump_manager.h:
+../Core/Inc/task_alarm_manager.h:
