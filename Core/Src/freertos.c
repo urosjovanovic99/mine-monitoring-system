@@ -31,6 +31,7 @@
 #include "task_co_sensor.h"
 #include "task_airflow.h"
 #include "task_pump_flow.h"
+#include "task_pump_manager.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +55,6 @@
  * handles below are CubeMX-owned; every task file pulls this in via
  * freertos_shared.h (extern SharedSensorData_t sharedSensorData;). */
 SharedSensorData_t sharedSensorData;
-PumpState_t pumpCommandedState = PUMP_OFF;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -98,6 +98,13 @@ const osThreadAttr_t PumpFlowTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow6,
 };
+/* Definitions for PumpManagerTask */
+osThreadId_t PumpManagerTaskHandle;
+const osThreadAttr_t PumpManagerTask_attributes = {
+  .name = "PumpManagerTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow2,
+};
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
@@ -123,6 +130,11 @@ osSemaphoreId_t waterLevelSemaphoreHandle;
 const osSemaphoreAttr_t waterLevelSemaphore_attributes = {
   .name = "waterLevelSemaphore"
 };
+/* Definitions for alarmEventSemaphore */
+osSemaphoreId_t alarmEventSemaphoreHandle;
+const osSemaphoreAttr_t alarmEventSemaphore_attributes = {
+  .name = "alarmEventSemaphore"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -135,6 +147,7 @@ void StartMethaneSensorTask(void *argument);
 void StartCOSensorTask(void *argument);
 void StartAirFlowSensorTask(void *argument);
 void StartPumpFlowTask(void *argument);
+void StartPumpManagerTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -164,6 +177,9 @@ void MX_FREERTOS_Init(void) {
   /* Create the semaphores(s) */
   /* creation of waterLevelSemaphore */
   waterLevelSemaphoreHandle = osSemaphoreNew(1, 0, &waterLevelSemaphore_attributes);
+
+  /* creation of alarmEventSemaphore */
+  alarmEventSemaphoreHandle = osSemaphoreNew(1, 0, &alarmEventSemaphore_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -199,6 +215,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of PumpFlowTask */
   PumpFlowTaskHandle = osThreadNew(StartPumpFlowTask, NULL, &PumpFlowTask_attributes);
+
+  /* creation of PumpManagerTask */
+  PumpManagerTaskHandle = osThreadNew(StartPumpManagerTask, NULL, &PumpManagerTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -296,6 +315,20 @@ void StartPumpFlowTask(void *argument)
   /* USER CODE BEGIN StartPumpFlowTask */
   PumpFlowTask_Run(argument);
   /* USER CODE END StartPumpFlowTask */
+}
+
+/* USER CODE BEGIN Header_StartPumpManagerTask */
+/**
+* @brief Function implementing the PumpManagerTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPumpManagerTask */
+void StartPumpManagerTask(void *argument)
+{
+  /* USER CODE BEGIN StartPumpManagerTask */
+  PumpManagerTask_Run(argument);
+  /* USER CODE END StartPumpManagerTask */
 }
 
 /* Private application code --------------------------------------------------*/

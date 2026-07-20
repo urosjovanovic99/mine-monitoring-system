@@ -76,6 +76,8 @@ void Error_Handler(void);
 #define USART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define PUMP_Pin GPIO_PIN_0
+#define PUMP_GPIO_Port GPIOB
 #define WATER_FLOW_SENSOR_Pin GPIO_PIN_1
 #define WATER_FLOW_SENSOR_GPIO_Port GPIOB
 #define TMS_Pin GPIO_PIN_13

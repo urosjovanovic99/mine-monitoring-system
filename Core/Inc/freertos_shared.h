@@ -38,9 +38,6 @@ extern osMutexId_t 		  pumpMutexHandle;
 /* Latest readings from all sensor tasks, guarded by sensorDataMutexHandle. */
 extern SharedSensorData_t sharedSensorData;
 
-typedef enum { PUMP_OFF = 0, PUMP_ON = 1 } PumpState_t;
-extern PumpState_t pumpCommandedState;
-
 #ifdef __cplusplus
 }
 #endif

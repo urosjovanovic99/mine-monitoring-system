@@ -43,7 +43,7 @@ Core/Src/task_pump_flow.o: ../Core/Src/task_pump_flow.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/usart.h
+ ../Core/Inc/task_pump_manager.h ../Core/Inc/usart.h
 ../Core/Inc/task_pump_flow.h:
 ../Core/Inc/freertos_shared.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
@@ -91,4 +91,5 @@ Core/Src/task_pump_flow.o: ../Core/Src/task_pump_flow.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+../Core/Inc/task_pump_manager.h:
 ../Core/Inc/usart.h:

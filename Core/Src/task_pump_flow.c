@@ -7,6 +7,7 @@
 
 #include "task_pump_flow.h"
 #include "freertos_shared.h"
+#include "task_pump_manager.h"
 #include "usart.h"
 #include <stdio.h>
 
