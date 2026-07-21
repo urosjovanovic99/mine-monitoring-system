@@ -34,6 +34,8 @@
 #include "task_pump_manager.h"
 #include "task_alarm_manager.h"
 #include "task_ui_comms.h"
+#include "usart.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,7 +120,7 @@ const osThreadAttr_t AlarmManageTask_attributes = {
 osThreadId_t UICommsTaskHandle;
 const osThreadAttr_t UICommsTask_attributes = {
   .name = "UICommsTask",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for pumpCommandQueue */
@@ -168,6 +170,38 @@ void StartAlarmManageTask(void *argument);
 void StartUICommsTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* Hook prototypes */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+void vApplicationMallocFailedHook(void);
+
+/* USER CODE BEGIN 4 */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+  /* Blocking, mutex-free HAL_UART_Transmit - same call every task already
+   * uses for logging - deliberately not going through uartLogMutexHandle:
+   * the scheduler that would arbitrate it may itself be compromised by the
+   * time this runs. Halt immediately afterward instead of letting a
+   * corrupted task keep going. */
+  char msg[64];
+  int len = snprintf(msg, sizeof(msg), "STACK OVERFLOW: %s\r\n", (char *)pcTaskName);
+  HAL_UART_Transmit(&huart2, (uint8_t *)msg, (uint16_t)len, 100);
+
+  taskDISABLE_INTERRUPTS();
+  for (;;) { }
+}
+/* USER CODE END 4 */
+
+/* USER CODE BEGIN 5 */
+void vApplicationMallocFailedHook(void)
+{
+  static const char msg[] = "MALLOC FAILED\r\n";
+  HAL_UART_Transmit(&huart2, (uint8_t *)msg, sizeof(msg) - 1, 100);
+
+  taskDISABLE_INTERRUPTS();
+  for (;;) { }
+}
+/* USER CODE END 5 */
 
 /**
   * @brief  FreeRTOS initialization

@@ -1,3 +1,3 @@
 ../Core/Src/task_alarm_manager.c:22:6:AlarmManager_RaiseCause	16	static
 ../Core/Src/task_alarm_manager.c:27:6:AlarmManager_Acknowledge	8	static
-../Core/Src/task_alarm_manager.c:32:6:AlarmManagerTask_Run	96	static
+../Core/Src/task_alarm_manager.c:32:6:AlarmManagerTask_Run	24	static
