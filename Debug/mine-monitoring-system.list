@@ -21,9 +21,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   8 .data         00000060  20000000  080097d4  0000b000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00004d14  20000060  08009834  0000b060  2**2
+  9 .bss          00005514  20000060  08009834  0000b060  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  20004d74  08009834  0000bd74  2**0
+ 10 ._user_heap_stack 00000604  20005574  08009834  0000b574  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0000b060  2**0
                   CONTENTS, READONLY
@@ -2393,7 +2393,7 @@ void *_sbrk(ptrdiff_t incr)
  8001050:	20020000 	.word	0x20020000
  8001054:	00000400 	.word	0x00000400
  8001058:	200001e0 	.word	0x200001e0
- 800105c:	20004d78 	.word	0x20004d78
+ 800105c:	20005578 	.word	0x20005578
 
 08001060 <SystemInit>:
   *         configuration.
@@ -4073,7 +4073,7 @@ LoopFillZerobss:
   ldr r2, =_sbss
  8001aa8:	20000060 	.word	0x20000060
   ldr r4, =_ebss
- 8001aac:	20004d74 	.word	0x20004d74
+ 8001aac:	20005574 	.word	0x20005574
 
 08001ab0 <ADC_IRQHandler>:
  * @retval None       
@@ -17958,9 +17958,9 @@ BaseType_t xReturn;
  80068b2:	46bd      	mov	sp, r7
  80068b4:	bd80      	pop	{r7, pc}
  80068b6:	bf00      	nop
- 80068b8:	20004c38 	.word	0x20004c38
- 80068bc:	20004ca0 	.word	0x20004ca0
- 80068c0:	20004d08 	.word	0x20004d08
+ 80068b8:	20005438 	.word	0x20005438
+ 80068bc:	200054a0 	.word	0x200054a0
+ 80068c0:	20005508 	.word	0x20005508
 
 080068c4 <prvAddNewTaskToReadyList>:
 /*-----------------------------------------------------------*/
@@ -23396,12 +23396,12 @@ void *pvReturn = NULL;
  800864a:	3728      	adds	r7, #40	@ 0x28
  800864c:	46bd      	mov	sp, r7
  800864e:	bd80      	pop	{r7, pc}
- 8008650:	20004c18 	.word	0x20004c18
- 8008654:	20004c2c 	.word	0x20004c2c
- 8008658:	20004c1c 	.word	0x20004c1c
- 800865c:	20004c10 	.word	0x20004c10
- 8008660:	20004c20 	.word	0x20004c20
- 8008664:	20004c24 	.word	0x20004c24
+ 8008650:	20005418 	.word	0x20005418
+ 8008654:	2000542c 	.word	0x2000542c
+ 8008658:	2000541c 	.word	0x2000541c
+ 800865c:	20005410 	.word	0x20005410
+ 8008660:	20005420 	.word	0x20005420
+ 8008664:	20005424 	.word	0x20005424
 
 08008668 <vPortFree>:
 /*-----------------------------------------------------------*/
@@ -23534,9 +23534,9 @@ BlockLink_t *pxLink;
  800871e:	46bd      	mov	sp, r7
  8008720:	bd80      	pop	{r7, pc}
  8008722:	bf00      	nop
- 8008724:	20004c2c 	.word	0x20004c2c
- 8008728:	20004c1c 	.word	0x20004c1c
- 800872c:	20004c28 	.word	0x20004c28
+ 8008724:	2000542c 	.word	0x2000542c
+ 8008728:	2000541c 	.word	0x2000541c
+ 800872c:	20005428 	.word	0x20005428
 
 08008730 <prvHeapInit>:
 	/* This just exists to keep the linker quiet. */
@@ -23552,7 +23552,7 @@ BlockLink_t *pxFirstFreeBlock;
 uint8_t *pucAlignedHeap;
 size_t uxAddress;
 size_t xTotalHeapSize = configTOTAL_HEAP_SIZE;
- 8008736:	f44f 5370 	mov.w	r3, #15360	@ 0x3c00
+ 8008736:	f44f 4388 	mov.w	r3, #17408	@ 0x4400
  800873a:	60bb      	str	r3, [r7, #8]
 
 	/* Ensure the heap starts on a correctly aligned boundary. */
@@ -23670,11 +23670,11 @@ size_t xTotalHeapSize = configTOTAL_HEAP_SIZE;
  80087d6:	f85d 7b04 	ldr.w	r7, [sp], #4
  80087da:	4770      	bx	lr
  80087dc:	20001010 	.word	0x20001010
- 80087e0:	20004c10 	.word	0x20004c10
- 80087e4:	20004c18 	.word	0x20004c18
- 80087e8:	20004c20 	.word	0x20004c20
- 80087ec:	20004c1c 	.word	0x20004c1c
- 80087f0:	20004c2c 	.word	0x20004c2c
+ 80087e0:	20005410 	.word	0x20005410
+ 80087e4:	20005418 	.word	0x20005418
+ 80087e8:	20005420 	.word	0x20005420
+ 80087ec:	2000541c 	.word	0x2000541c
+ 80087f0:	2000542c 	.word	0x2000542c
 
 080087f4 <prvInsertBlockIntoFreeList>:
 /*-----------------------------------------------------------*/
@@ -23818,8 +23818,8 @@ uint8_t *puc;
  8008898:	f85d 7b04 	ldr.w	r7, [sp], #4
  800889c:	4770      	bx	lr
  800889e:	bf00      	nop
- 80088a0:	20004c10 	.word	0x20004c10
- 80088a4:	20004c18 	.word	0x20004c18
+ 80088a0:	20005410 	.word	0x20005410
+ 80088a4:	20005418 	.word	0x20005418
 
 080088a8 <sbrk_aligned>:
  80088a8:	b570      	push	{r4, r5, r6, lr}
@@ -23849,7 +23849,7 @@ uint8_t *puc;
  80088e2:	d1f2      	bne.n	80088ca <sbrk_aligned+0x22>
  80088e4:	e7ef      	b.n	80088c6 <sbrk_aligned+0x1e>
  80088e6:	bf00      	nop
- 80088e8:	20004c30 	.word	0x20004c30
+ 80088e8:	20005430 	.word	0x20005430
 
 080088ec <_malloc_r>:
  80088ec:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -23959,7 +23959,7 @@ uint8_t *puc;
  80089e2:	6005      	str	r5, [r0, #0]
  80089e4:	e7d6      	b.n	8008994 <_malloc_r+0xa8>
  80089e6:	bf00      	nop
- 80089e8:	20004c34 	.word	0x20004c34
+ 80089e8:	20005434 	.word	0x20005434
 
 080089ec <__malloc_lock>:
  80089ec:	4801      	ldr	r0, [pc, #4]	@ (80089f4 <__malloc_lock+0x8>)
@@ -24124,7 +24124,7 @@ uint8_t *puc;
  8008b52:	b103      	cbz	r3, 8008b56 <_sbrk_r+0x1a>
  8008b54:	6023      	str	r3, [r4, #0]
  8008b56:	bd38      	pop	{r3, r4, r5, pc}
- 8008b58:	20004d70 	.word	0x20004d70
+ 8008b58:	20005570 	.word	0x20005570
 
 08008b5c <__errno>:
  8008b5c:	4b01      	ldr	r3, [pc, #4]	@ (8008b64 <__errno+0x8>)
@@ -24246,7 +24246,7 @@ uint8_t *puc;
  8008c56:	e7ca      	b.n	8008bee <_free_r+0x22>
  8008c58:	bd38      	pop	{r3, r4, r5, pc}
  8008c5a:	bf00      	nop
- 8008c5c:	20004c34 	.word	0x20004c34
+ 8008c5c:	20005434 	.word	0x20005434
 
 08008c60 <__ssputs_r>:
  8008c60:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}

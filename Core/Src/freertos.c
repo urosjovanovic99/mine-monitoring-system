@@ -96,14 +96,14 @@ const osThreadAttr_t AirFlowTask_attributes = {
 osThreadId_t PumpFlowTaskHandle;
 const osThreadAttr_t PumpFlowTask_attributes = {
   .name = "PumpFlowTask",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow6,
 };
 /* Definitions for PumpManagerTask */
 osThreadId_t PumpManagerTaskHandle;
 const osThreadAttr_t PumpManagerTask_attributes = {
   .name = "PumpManagerTask",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow2,
 };
 /* Definitions for AlarmManageTask */
