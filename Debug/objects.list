@@ -15,6 +15,7 @@
 "./Core/Src/task_methane.o"
 "./Core/Src/task_pump_flow.o"
 "./Core/Src/task_pump_manager.o"
+"./Core/Src/task_ui_comms.o"
 "./Core/Src/task_water_level.o"
 "./Core/Src/usart.o"
 "./Core/Startup/startup_stm32f446retx.o"

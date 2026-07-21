@@ -33,6 +33,7 @@
 #include "task_pump_flow.h"
 #include "task_pump_manager.h"
 #include "task_alarm_manager.h"
+#include "task_ui_comms.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,6 +114,13 @@ const osThreadAttr_t AlarmManageTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow1,
 };
+/* Definitions for UICommsTask */
+osThreadId_t UICommsTaskHandle;
+const osThreadAttr_t UICommsTask_attributes = {
+  .name = "UICommsTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 /* Definitions for pumpCommandQueue */
 osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
@@ -157,6 +165,7 @@ void StartAirFlowSensorTask(void *argument);
 void StartPumpFlowTask(void *argument);
 void StartPumpManagerTask(void *argument);
 void StartAlarmManageTask(void *argument);
+void StartUICommsTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -227,6 +236,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of AlarmManageTask */
   AlarmManageTaskHandle = osThreadNew(StartAlarmManageTask, NULL, &AlarmManageTask_attributes);
+
+  /* creation of UICommsTask */
+  UICommsTaskHandle = osThreadNew(StartUICommsTask, NULL, &UICommsTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -355,6 +367,20 @@ void StartAlarmManageTask(void *argument)
   /* USER CODE BEGIN StartAlarmManageTask */
   AlarmManagerTask_Run(argument);
   /* USER CODE END StartAlarmManageTask */
+}
+
+/* USER CODE BEGIN Header_StartUICommsTask */
+/**
+* @brief Function implementing the UICommsTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartUICommsTask */
+void StartUICommsTask(void *argument)
+{
+  /* USER CODE BEGIN StartUICommsTask */
+  UICommsTask_Run(argument);
+  /* USER CODE END StartUICommsTask */
 }
 
 /* Private application code --------------------------------------------------*/

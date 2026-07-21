@@ -5,6 +5,9 @@ machine LoadPlatformDescription @renode/mine_monitor_adc.repl
 
 showAnalyzer sysbus.usart2
 
+emulation CreateServerSocketTerminal 3456 "uartBridge" true
+connector Connect sysbus.usart2 uartBridge
+
 macro reset
 """
     sysbus LoadELF @Debug/mine-monitoring-system.elf
