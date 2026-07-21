@@ -9,6 +9,8 @@
 #include "freertos_shared.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "usart.h"
+#include <stdio.h>
 
 AlarmState_t alarmCommandedState = ALARM_OFF;
 
@@ -29,6 +31,10 @@ void AlarmManager_Acknowledge(void)
 
 void AlarmManagerTask_Run(void *argument)
 {
+#if DEBUG_UART_LOGGING
+  char dbgBuf[64];
+  int  dbgLen;
+#endif
   for (;;)
   {
     /* osEventFlagsWait() clears the matched bits on return by default
@@ -62,6 +68,12 @@ void AlarmManagerTask_Run(void *argument)
       HAL_GPIO_WritePin(ALARM_GPIO_Port, ALARM_Pin,
                          (shouldBe == ALARM_ON) ? GPIO_PIN_SET : GPIO_PIN_RESET);
       alarmCommandedState = shouldBe;
+#if DEBUG_UART_LOGGING
+      osMutexAcquire(uartLogMutexHandle, osWaitForever);
+      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), (shouldBe == ALARM_ON) ? "ALARM IS ON\n" : "ALARM IS OFF\n");
+      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
+      osMutexRelease(uartLogMutexHandle);
+#endif
     }
   }
 }
