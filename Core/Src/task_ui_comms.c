@@ -10,6 +10,7 @@
 #include "freertos_shared.h"
 #include "task_alarm_manager.h"
 #include "task_pump_manager.h"
+#include "task_pump_flow.h"
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
@@ -107,10 +108,12 @@ static void UIComms_SendTelemetry(void)
       "{\"methane\":%u,\"methane_valid\":%u,"
       "\"co\":%u,\"co_valid\":%u,"
       "\"airflow\":%u,\"airflow_valid\":%u,"
+      "\"waterflow\":%u,"
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
+	  (unsigned)waterFlowState,
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)

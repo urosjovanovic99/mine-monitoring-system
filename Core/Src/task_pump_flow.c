@@ -12,6 +12,8 @@
 #include "usart.h"
 #include <stdio.h>
 
+WaterFlowState_t waterFlowState = WATER_FLOW_OFF;
+
 void PumpFlowTask_Run(void *argument)
 {
   /* USER CODE BEGIN PumpFlowMonitorTask */
@@ -39,6 +41,8 @@ void PumpFlowTask_Run(void *argument)
 
       GPIO_PinState flowPin = HAL_GPIO_ReadPin(WATER_FLOW_SENSOR_GPIO_Port, WATER_FLOW_SENSOR_Pin);
       BaseType_t flowPresent = (flowPin == WATER_FLOW_ACTIVE_STATE) ? pdTRUE : pdFALSE;
+
+      waterFlowState = flowPresent == pdTRUE ? WATER_FLOW_ON : WATER_FLOW_OFF;
 
       if (currentCommand != lastObservedCommand)
       {
