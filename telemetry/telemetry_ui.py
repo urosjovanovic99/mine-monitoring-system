@@ -93,6 +93,7 @@ class TelemetryClient(QThread):
             return False
         try:
             payload = (json.dumps(command) + "\n").encode("utf-8")
+            print(f"Sending command: {payload!r}")
             self._sock.sendall(payload)
             return True
         except OSError:

@@ -76,7 +76,7 @@ static BaseType_t UIComms_TryReadLine(char *line, size_t maxLen)
  * decision worth making explicitly rather than defaulting into. */
 static void UIComms_HandleLine(const char *line)
 {
-  if (strstr(line, "\"cmd\":\"ALARM_ACK\"") != NULL)
+  if (strstr(line, "\"cmd\"") != NULL && strstr(line, "ALARM_ACK") != NULL)
   {
     AlarmManager_Acknowledge();
   }
