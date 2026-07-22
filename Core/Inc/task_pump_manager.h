@@ -15,6 +15,7 @@ extern "C" {
 typedef enum { PUMP_OFF = 0, PUMP_ON = 1 } PumpState_t;
 extern PumpState_t pumpCommandedState;
 
+void PumpManager_Toggle(void);
 void PumpManagerTask_Run(void *argument);
 
 

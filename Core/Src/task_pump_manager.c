@@ -50,13 +50,24 @@ static BaseType_t PumpManager_IsEnvironmentSafe(void)
   return pdTRUE;
 }
 
-static void PumpManager_SetPumpState(PumpState_t newState)
+static void PumpManager_ApplyStateLocked(PumpState_t newState)
 {
   HAL_GPIO_WritePin(PUMP_GPIO_Port, PUMP_Pin,
                      (newState == PUMP_ON) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-
-  osMutexAcquire(pumpMutexHandle, osWaitForever);
   pumpCommandedState = newState;
+}
+
+static void PumpManager_SetPumpState(PumpState_t newState)
+{
+  osMutexAcquire(pumpMutexHandle, osWaitForever);
+  PumpManager_ApplyStateLocked(newState);
+  osMutexRelease(pumpMutexHandle);
+}
+
+void PumpManager_Toggle(void)
+{
+  osMutexAcquire(pumpMutexHandle, osWaitForever);
+  PumpManager_ApplyStateLocked(pumpCommandedState == PUMP_OFF ? PUMP_ON : PUMP_OFF);
   osMutexRelease(pumpMutexHandle);
 }
 

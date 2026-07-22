@@ -1,26 +1,3 @@
-"""
-PyQt5 dashboard - connects to the Renode UART<->TCP bridge, not a serial port.
-
-Renode exposes USART2 as a plain TCP socket via:
-    emulation CreateServerSocketTerminal 3456 "uartBridge" true
-    connector Connect sysbus.usart2 "uartBridge"
-
-So the PC side is a normal socket client - no COM port, no pyserial needed.
-Framing matches the firmware (task_ui_comms.c): one JSON object per line,
-both directions. Downlink schema:
-    {"methane":<u16>,"methane_valid":0|1,
-     "co":<u16>,"co_valid":0|1,
-     "airflow":<u16>,"airflow_valid":0|1,
-     "pump":0|1,"alarm":0|1}
-Uplink: only {"cmd":"ALARM_ACK"} is wired up on the firmware side so far.
-A pump manual-override command isn't implemented yet - it needs a
-safety-gated entry point added in task_pump_manager.c first (see the
-comment in task_ui_comms.c) so it can't just force the pump on during a
-methane-critical condition.
-
-pip install PyQt5
-"""
-
 import sys
 import json
 import socket
@@ -32,9 +9,6 @@ from PyQt5.QtWidgets import (
 
 
 class TelemetryClient(QThread):
-    """Owns the TCP socket. Runs its own read loop; emits one signal per
-    telemetry line and one signal on connection state changes."""
-
     telemetry_received = pyqtSignal(dict)
     connection_changed = pyqtSignal(bool, str)
 
@@ -87,8 +61,6 @@ class TelemetryClient(QThread):
         self.telemetry_received.emit(data)
 
     def send_command(self, command: dict):
-        """Uplink: PC -> MCU. Thread-safe enough for occasional button clicks;
-        add a queue/mutex if commands can be sent from multiple threads."""
         if self._sock is None:
             return False
         try:
@@ -135,7 +107,9 @@ class DashboardWindow(QMainWindow):
 
         buttons = QHBoxLayout()
         self.ack_btn = QPushButton("Acknowledge alarm")
+        self.pump_switch = QPushButton("Pump switch")
         buttons.addWidget(self.ack_btn)
+        buttons.addWidget(self.pump_switch)
         layout.addLayout(buttons)
 
         self.status = QStatusBar()
@@ -147,6 +121,8 @@ class DashboardWindow(QMainWindow):
 
         self.ack_btn.clicked.connect(lambda: self.client.send_command(
             {"cmd": "ALARM_ACK"}))
+        self.pump_switch.clicked.connect(lambda: self.client.send_command(
+            {"cmd": "PUMP_TOGGLE"}))
 
         self.client.start()
 
@@ -161,7 +137,7 @@ class DashboardWindow(QMainWindow):
         self.airflow_label.setText(fmt(data.get('airflow', '--'), 'airflow_valid'))
         self.pump_water_flow_label.setText("FLOW" if data.get('waterflow') else "NO FLOW")
         self.pump_label.setText("ON" if data.get('pump') else "OFF")
-        self.alarm_label.setText("ACTIVE" if data.get('alarm') else "clear")
+        self.alarm_label.setText("ACTIVE" if data.get('alarm') else "DEACTIVATED")
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

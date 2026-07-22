@@ -64,22 +64,15 @@ static BaseType_t UIComms_TryReadLine(char *line, size_t maxLen)
   return pdFALSE;
 }
 
-/* Hand-rolled on purpose - avoids pulling a JSON library (and its heap use)
- * into a task that still has to fit the project's RTA. Only ALARM_ACK is
- * wired up for now: task_alarm_manager.h already exposes
- * AlarmManager_Acknowledge() specifically for this. A pump manual-override
- * command is NOT wired here yet - PumpManager_SetPumpState() is static and
- * bypasses PumpManager_IsEnvironmentSafe(), so blindly exposing it to the
- * UI would let an operator force the pump on during a methane-critical
- * condition. That needs a deliberate safety-gated entry point in
- * task_pump_manager.c first (e.g. one that still checks
- * PumpManager_IsEnvironmentSafe() before honoring an override) - a design
- * decision worth making explicitly rather than defaulting into. */
 static void UIComms_HandleLine(const char *line)
 {
   if (strstr(line, "\"cmd\"") != NULL && strstr(line, "ALARM_ACK") != NULL)
   {
     AlarmManager_Acknowledge();
+  }
+  else if (strstr(line, "\"cmd\"") != NULL && strstr(line, "PUMP_TOGGLE") != NULL)
+  {
+    PumpManager_Toggle();
   }
   /* Unknown/partial commands are ignored - keep this task non-blocking. */
 }
