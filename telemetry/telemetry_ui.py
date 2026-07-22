@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import (
     QLabel, QPushButton, QHBoxLayout, QStatusBar,
 )
 
+from telemetry_logger import TelemetryArchiver
+
 
 class TelemetryClient(QThread):
     telemetry_received = pyqtSignal(dict)
@@ -115,18 +117,28 @@ class DashboardWindow(QMainWindow):
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
+        self.archiver = TelemetryArchiver()
+
         self.client = TelemetryClient(host="127.0.0.1", port=3456)
         self.client.telemetry_received.connect(self.on_telemetry)
         self.client.connection_changed.connect(self.on_connection_changed)
 
-        self.ack_btn.clicked.connect(lambda: self.client.send_command(
-            {"cmd": "ALARM_ACK"}))
-        self.pump_switch.clicked.connect(lambda: self.client.send_command(
-            {"cmd": "PUMP_TOGGLE"}))
+        self.ack_btn.clicked.connect(self.on_ack_clicked)
+        self.pump_switch.clicked.connect(self.on_pump_switch_clicked)
 
         self.client.start()
 
+    def on_ack_clicked(self):
+        self.archiver.log_user_action("ALARM_ACK")
+        self.client.send_command({"cmd": "ALARM_ACK"})
+
+    def on_pump_switch_clicked(self):
+        self.archiver.log_user_action("PUMP_TOGGLE")
+        self.client.send_command({"cmd": "PUMP_TOGGLE"})
+
     def on_telemetry(self, data: dict):
+        self.archiver.log_telemetry(data)
+
         def fmt(value, valid_key):
             if valid_key is not None and not data.get(valid_key, 1):
                 return f"{value} (not yet valid)"
@@ -145,6 +157,7 @@ class DashboardWindow(QMainWindow):
     def closeEvent(self, event):
         self.client.stop()
         self.client.wait(2000)
+        self.archiver.close()
         event.accept()
 
 
