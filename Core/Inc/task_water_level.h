@@ -14,14 +14,10 @@
 extern "C" {
 #endif
 
-/* WaterLevelEvent_t is defined in main.h (WATER_LEVEL_NORMAL/HIGH/LOW). */
+#define WATER_LEVEL_DEADLINE_MS          200U
+#define WATER_LEVEL_MIN_INTERARRIVAL_MS  5000U
+#define WATER_LEVEL_DEBOUNCE_MS          50U
 
-/**
- * @brief  Body of WaterLevelTask. Called from StartWaterLevelTask() in
- *         freertos.c.
- * @param  argument: Not used
- * @retval None (never returns)
- */
 void WaterLevelTask_Run(void *argument);
 
 #ifdef __cplusplus
