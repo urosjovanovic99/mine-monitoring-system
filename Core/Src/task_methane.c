@@ -21,10 +21,6 @@ void MethaneTask_Run(void *argument)
   uint16_t methaneValue;
   BaseType_t bConversionOk;
   uint8_t consecutiveErrors = 0;
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
   /* Prime the pipeline: kick off the very first conversion before
      the periodic loop starts, so period 1's read has something
      to read. */
@@ -63,13 +59,6 @@ void MethaneTask_Run(void *argument)
       {
         PumpManager_SetMethaneCritical(pdFALSE);
       }
-#if DEBUG_UART_LOGGING
-      osMutexAcquire(uartLogMutexHandle, osWaitForever);
-      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CH4 raw=%u tick=%lu\r\n",
-                         methaneValue, (unsigned long)xLastWakeTime);
-      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-      osMutexRelease(uartLogMutexHandle);
-#endif
     }
     else
     {

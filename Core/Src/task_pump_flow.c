@@ -25,11 +25,6 @@ void PumpFlowTask_Run(void *argument)
   uint8_t     settlingCounter     = 0;
   BaseType_t  settling            = pdFALSE;
 
-#if DEBUG_UART_LOGGING
-  char dbgBuf[80];
-  int  dbgLen;
-#endif
-
   xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
@@ -69,16 +64,6 @@ void PumpFlowTask_Run(void *argument)
               if (mismatch)
               {
                   AlarmManager_RaiseCause(ALARM_BIT_PUMPFAULT);
-#if DEBUG_UART_LOGGING
-                  osMutexAcquire(uartLogMutexHandle, osWaitForever);
-                  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                      "PUMPFLOW FAULT: cmd=%s flow=%s tick=%lu\r\n",
-                      (targetCommand == PUMP_ON) ? "ON" : "OFF",
-                      flowPresent ? "YES" : "NO",
-                      (unsigned long)xLastWakeTime);
-                  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-                  osMutexRelease(uartLogMutexHandle);
-#endif
               }
           }
           /* else: still inside the N do-nothing activations */
@@ -95,16 +80,6 @@ void PumpFlowTask_Run(void *argument)
               (targetCommand == PUMP_ON  && !flowPresent) ||
               (targetCommand == PUMP_OFF &&  flowPresent);
 
-#if DEBUG_UART_LOGGING
-		  osMutexAcquire(uartLogMutexHandle, osWaitForever);
-		  dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-			  "Steady state: cmd=%s flow=%s tick=%lu\r\n",
-			  (targetCommand == PUMP_ON) ? "ON" : "OFF",
-			  flowPresent ? "YES" : "NO",
-			  (unsigned long)xLastWakeTime);
-		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-		  osMutexRelease(uartLogMutexHandle);
-#endif
           if (mismatch)
           {
               AlarmManager_RaiseCause(ALARM_BIT_PUMPFAULT);

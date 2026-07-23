@@ -94,11 +94,6 @@ void PumpManager_Toggle(void)
 void PumpManagerTask_Run(void *argument) {
   uint16_t rawEvent;
 
-#if DEBUG_UART_LOGGING
-  char dbgBuf[80];
-  int  dbgLen;
-#endif
-
   for(;;)
   {
 	  if (osMessageQueueGet(pumpCommandQueueHandle, &rawEvent, NULL, osWaitForever) != osOK)
@@ -114,10 +109,6 @@ void PumpManagerTask_Run(void *argument) {
 		  if(PumpManager_IsEnvironmentSafe())
 		  {
 			PumpManager_SetPumpState(PUMP_ON);
-#if DEBUG_UART_LOGGING
-          dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                             "PumpManagerTask: HIGH + env OK -> pump ON\r\n");
-#endif
 		  }
 		  else
 		  {
@@ -128,10 +119,6 @@ void PumpManagerTask_Run(void *argument) {
 				   moment it detected it) or because a reading isn't valid yet
 				   (e.g. still warming up), which is not itself an alarm condition.
 				   Duplicating the raise here would risk a false alarm on startup. */
-#if DEBUG_UART_LOGGING
-			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-							   "PumpManagerTask: HIGH but env UNSAFE -> pump OFF\r\n");
-#endif
 		  }
 		  break;
 	  }
@@ -144,27 +131,12 @@ void PumpManagerTask_Run(void *argument) {
 		  if(current == PUMP_ON) {
 			  PumpManager_SetPumpState(PUMP_OFF);
 		  }
-#if DEBUG_UART_LOGGING
-        dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                           "PumpManagerTask: LOW -> pump OFF (was %s)\r\n",
-                           (current == PUMP_ON) ? "ON" : "already OFF");
-#endif
         break;
 	  }
 	  case WATER_LEVEL_NORMAL:
 	  {
-#if DEBUG_UART_LOGGING
-        dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                           "PumpManagerTask: NORMAL -> no action\r\n");
-#endif
         break;
 	  }
 	  }
-
-#if DEBUG_UART_LOGGING
-    osMutexAcquire(uartLogMutexHandle, osWaitForever);
-    HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-    osMutexRelease(uartLogMutexHandle);
-#endif
   }
 }

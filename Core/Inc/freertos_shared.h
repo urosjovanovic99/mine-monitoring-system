@@ -25,9 +25,6 @@
 extern "C" {
 #endif
 
-/* Set to 1 to enable per-sample UART debug logging from the sensor tasks. */
-#define DEBUG_UART_LOGGING   0
-
 /* RTOS objects created in MX_FREERTOS_Init() (freertos.c), used by task files. */
 extern osMutexId_t        sensorDataMutexHandle;
 extern osMutexId_t        uartLogMutexHandle;

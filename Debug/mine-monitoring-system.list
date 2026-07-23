@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 000013d0  00000000  00000000  000343a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00028f55  00000000  00000000  00035770  2**0
+ 16 .debug_macro  00028f1f  00000000  00000000  00035770  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00024038  00000000  00000000  0005e6c5  2**0
+ 17 .debug_line   00024027  00000000  00000000  0005e68f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000eaf65  00000000  00000000  000826fd  2**0
+ 18 .debug_str    000eaf50  00000000  00000000  000826b6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0016d662  2**0
+ 19 .comment      00000043  00000000  00000000  0016d606  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00006918  00000000  00000000  0016d6a8  2**2
+ 20 .debug_frame  00006918  00000000  00000000  0016d64c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000084  00000000  00000000  00173fc0  2**0
+ 21 .debug_line_str 00000084  00000000  00000000  00173f64  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2595,10 +2595,6 @@ void AirFlowTask_Run(void *argument)
   uint8_t consecutiveErrors = 0;
  8001154:	2300      	movs	r3, #0
  8001156:	77fb      	strb	r3, [r7, #31]
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
 
   ADC_HW_StartConversion(&hadc3);
  8001158:	4828      	ldr	r0, [pc, #160]	@ (80011fc <AirFlowTask_Run+0xb4>)
@@ -2654,8 +2650,6 @@ void AirFlowTask_Run(void *argument)
  80011ac:	681b      	ldr	r3, [r3, #0]
  80011ae:	4618      	mov	r0, r3
  80011b0:	f004 f9a8 	bl	8005504 <osMutexRelease>
-      osMutexRelease(uartLogMutexHandle);
-#endif
 
       /* Air flow alarms on too LOW a reading, not too high -
          insufficient ventilation is the fault condition here. */
@@ -2880,10 +2874,6 @@ void COSensorTask_Run(void *argument)
   uint8_t consecutiveErrors = 0;
  80012e8:	2300      	movs	r3, #0
  80012ea:	77fb      	strb	r3, [r7, #31]
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
 
   ADC_HW_StartConversion(&hadc2);
  80012ec:	4828      	ldr	r0, [pc, #160]	@ (8001390 <COSensorTask_Run+0xb4>)
@@ -2939,10 +2929,6 @@ void COSensorTask_Run(void *argument)
  8001340:	681b      	ldr	r3, [r3, #0]
  8001342:	4618      	mov	r0, r3
  8001344:	f004 f8de 	bl	8005504 <osMutexRelease>
-                         coValue, (unsigned long)xLastWakeTime);
-      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-      osMutexRelease(uartLogMutexHandle);
-#endif
 
       if (coValue >= CO_CRITICAL_THRESHOLD)
  8001348:	89fb      	ldrh	r3, [r7, #14]
@@ -3019,8 +3005,6 @@ void MethaneTask_Run(void *argument)
   uint8_t consecutiveErrors = 0;
  80013a8:	2300      	movs	r3, #0
  80013aa:	77fb      	strb	r3, [r7, #31]
-  int  dbgLen;
-#endif
   /* Prime the pipeline: kick off the very first conversion before
      the periodic loop starts, so period 1's read has something
      to read. */
@@ -3105,7 +3089,7 @@ void MethaneTask_Run(void *argument)
  800141e:	2000      	movs	r0, #0
  8001420:	f000 f920 	bl	8001664 <PumpManager_SetMethaneCritical>
  8001424:	e7c9      	b.n	80013ba <MethaneTask_Run+0x1e>
-#endif
+      }
     }
     else
     {
@@ -3183,10 +3167,6 @@ void PumpFlowTask_Run(void *argument)
   BaseType_t  settling            = pdFALSE;
  800148e:	2300      	movs	r3, #0
  8001490:	623b      	str	r3, [r7, #32]
-#if DEBUG_UART_LOGGING
-  char dbgBuf[80];
-  int  dbgLen;
-#endif
 
   xLastWakeTime = xTaskGetTickCount();
  8001492:	f006 fa17 	bl	80078c4 <xTaskGetTickCount>
@@ -3340,11 +3320,7 @@ void PumpFlowTask_Run(void *argument)
  8001580:	2300      	movs	r3, #0
           BaseType_t mismatch =
  8001582:	613b      	str	r3, [r7, #16]
-			  flowPresent ? "YES" : "NO",
-			  (unsigned long)xLastWakeTime);
-		  HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-		  osMutexRelease(uartLogMutexHandle);
-#endif
+
           if (mismatch)
  8001584:	693b      	ldr	r3, [r7, #16]
  8001586:	2b00      	cmp	r3, #0
@@ -3612,8 +3588,7 @@ void PumpManagerTask_Run(void *argument) {
  800171e:	b084      	sub	sp, #16
  8001720:	af00      	add	r7, sp, #0
  8001722:	6078      	str	r0, [r7, #4]
-  int  dbgLen;
-#endif
+  uint16_t rawEvent;
 
   for(;;)
   {
@@ -3656,10 +3631,10 @@ void PumpManagerTask_Run(void *argument) {
 			PumpManager_SetPumpState(PUMP_ON);
  800175c:	2001      	movs	r0, #1
  800175e:	f7ff ffa3 	bl	80016a8 <PumpManager_SetPumpState>
-#if DEBUG_UART_LOGGING
-			dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-							   "PumpManagerTask: HIGH but env UNSAFE -> pump OFF\r\n");
-#endif
+				   sensor's own task already called AlarmManager_RaiseCause the
+				   moment it detected it) or because a reading isn't valid yet
+				   (e.g. still warming up), which is not itself an alarm condition.
+				   Duplicating the raise here would risk a false alarm on startup. */
 		  }
 		  break;
  8001762:	e01e      	b.n	80017a2 <PumpManagerTask_Run+0x86>
@@ -3694,21 +3669,15 @@ void PumpManagerTask_Run(void *argument) {
 			  PumpManager_SetPumpState(PUMP_OFF);
  8001790:	2000      	movs	r0, #0
  8001792:	f7ff ff89 	bl	80016a8 <PumpManager_SetPumpState>
-#if DEBUG_UART_LOGGING
-        dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                           "PumpManagerTask: LOW -> pump OFF (was %s)\r\n",
-                           (current == PUMP_ON) ? "ON" : "already OFF");
-#endif
+		  }
         break;
  8001796:	e003      	b.n	80017a0 <PumpManagerTask_Run+0x84>
 		continue;
  8001798:	bf00      	nop
  800179a:	e7c3      	b.n	8001724 <PumpManagerTask_Run+0x8>
+	  }
+	  case WATER_LEVEL_NORMAL:
 	  {
-#if DEBUG_UART_LOGGING
-        dbgLen = snprintf(dbgBuf, sizeof(dbgBuf),
-                           "PumpManagerTask: NORMAL -> no action\r\n");
-#endif
         break;
  800179c:	bf00      	nop
  800179e:	e7c1      	b.n	8001724 <PumpManagerTask_Run+0x8>

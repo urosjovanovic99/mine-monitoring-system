@@ -21,11 +21,6 @@ void COSensorTask_Run(void *argument)
   BaseType_t bConversionOk;
   uint8_t consecutiveErrors = 0;
 
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
-
   ADC_HW_StartConversion(&hadc2);
 
   xLastWakeTime = xTaskGetTickCount();
@@ -44,14 +39,6 @@ void COSensorTask_Run(void *argument)
       sharedSensorData.coLevel = coValue;
       sharedSensorData.coValid = pdTRUE;
       osMutexRelease(sensorDataMutexHandle);
-
-#if DEBUG_UART_LOGGING
-      osMutexAcquire(uartLogMutexHandle, osWaitForever);
-      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CO raw=%u tick=%lu\r\n",
-                         coValue, (unsigned long)xLastWakeTime);
-      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-      osMutexRelease(uartLogMutexHandle);
-#endif
 
       if (coValue >= CO_CRITICAL_THRESHOLD)
       {

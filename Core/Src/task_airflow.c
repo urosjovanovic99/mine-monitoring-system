@@ -21,11 +21,6 @@ void AirFlowTask_Run(void *argument)
   BaseType_t bConversionOk;
   uint8_t consecutiveErrors = 0;
 
-#if DEBUG_UART_LOGGING
-  char dbgBuf[64];
-  int  dbgLen;
-#endif
-
   ADC_HW_StartConversion(&hadc3);
 
   xLastWakeTime = xTaskGetTickCount();
@@ -44,14 +39,6 @@ void AirFlowTask_Run(void *argument)
       sharedSensorData.airFlowLevel = airFlowValue;
       sharedSensorData.airFlowValid = pdTRUE;
       osMutexRelease(sensorDataMutexHandle);
-
-#if DEBUG_UART_LOGGING
-      osMutexAcquire(uartLogMutexHandle, osWaitForever);
-      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW raw=%u tick=%lu\r\n",
-                         airFlowValue, (unsigned long)xLastWakeTime);
-      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-      osMutexRelease(uartLogMutexHandle);
-#endif
 
       /* Air flow alarms on too LOW a reading, not too high -
          insufficient ventilation is the fault condition here. */
@@ -76,14 +63,6 @@ void AirFlowTask_Run(void *argument)
       {
         AlarmManager_RaiseCause(ALARM_BIT_AIRFLOW);
       }
-
-#if DEBUG_UART_LOGGING
-      osMutexAcquire(uartLogMutexHandle, osWaitForever);
-      dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "AIRFLOW ERROR (%u consecutive) tick=%lu\r\n",
-                         consecutiveErrors, (unsigned long)xLastWakeTime);
-      HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
-      osMutexRelease(uartLogMutexHandle);
-#endif
     }
   }
 }
