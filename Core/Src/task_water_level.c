@@ -9,6 +9,8 @@
 #include "freertos_shared.h"
 #include "cmsis_os.h"
 
+volatile WaterLevelEvent_t waterLevelState = WATER_LEVEL_NORMAL;
+
 void WaterLevelTask_Run(void *argument)
 {
   uint32_t          lastEventTick = 0U;
@@ -46,6 +48,8 @@ void WaterLevelTask_Run(void *argument)
       lastEventTick = now;
       lastEvent     = evt;
       hasAccepted   = 1U;
+
+      waterLevelState = evt; /* publish latest level for UI telemetry */
 
       osMessageQueuePut(pumpCommandQueueHandle, &evt, 0, 0);
     }

@@ -18,6 +18,11 @@ extern "C" {
 #define WATER_LEVEL_MIN_INTERARRIVAL_MS  5000U
 #define WATER_LEVEL_DEBOUNCE_MS          50U
 
+/* Latest accepted water level. Single writer (WaterLevelTask), read without a
+ * mutex by task_ui_comms.c - same word-sized single-writer assumption already
+ * relied on for waterFlowState. */
+extern volatile WaterLevelEvent_t waterLevelState;
+
 void WaterLevelTask_Run(void *argument);
 
 #ifdef __cplusplus

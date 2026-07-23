@@ -1,13 +1,13 @@
 import sys
 import json
 import socket
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
+from PyQt5.QtCore import QThread, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QPushButton, QHBoxLayout, QStatusBar,
 )
 
-from telemetry_logger import TelemetryArchiver
+from telemetry_logger import TelemetryArchiver, water_level_text
 
 
 class TelemetryClient(QThread):
@@ -86,11 +86,14 @@ class DashboardWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mine Monitoring - Telemetry")
-        self.resize(360, 260)
+        self.resize(520, 260)
 
         central = QWidget()
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
+
+        # Left side: sensor readings. Right side: current water level.
+        top = QHBoxLayout()
 
         form = QFormLayout()
         self.methane_label = QLabel("--")
@@ -105,7 +108,23 @@ class DashboardWindow(QMainWindow):
         form.addRow("Pump water flow:", self.pump_water_flow_label)
         form.addRow("Pump running:", self.pump_label)
         form.addRow("Alarm active:", self.alarm_label)
-        layout.addLayout(form)
+        top.addLayout(form)
+
+        top.addStretch(1)
+
+        water_panel = QVBoxLayout()
+        water_title = QLabel("Water level")
+        water_title.setAlignment(Qt.AlignCenter)
+        self.water_level_label = QLabel("--")
+        self.water_level_label.setAlignment(Qt.AlignCenter)
+        self.water_level_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        water_panel.addStretch(1)
+        water_panel.addWidget(water_title)
+        water_panel.addWidget(self.water_level_label)
+        water_panel.addStretch(1)
+        top.addLayout(water_panel)
+
+        layout.addLayout(top)
 
         buttons = QHBoxLayout()
         self.ack_btn = QPushButton("Acknowledge alarm")
@@ -150,6 +169,7 @@ class DashboardWindow(QMainWindow):
         self.pump_water_flow_label.setText("FLOW" if data.get('waterflow') else "NO FLOW")
         self.pump_label.setText("ON" if data.get('pump') else "OFF")
         self.alarm_label.setText("ACTIVE" if data.get('alarm') else "DEACTIVATED")
+        self.water_level_label.setText(water_level_text(data.get('water_level')))
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

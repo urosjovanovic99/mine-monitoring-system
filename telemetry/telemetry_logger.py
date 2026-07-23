@@ -4,8 +4,23 @@ from datetime import datetime
 
 COLUMNS = [
     "Timestamp", "CH4", "CO", "Air Flow",
-    "Pump water flow", "Pump flag", "Alarm flag", "User action",
+    "Pump water flow", "WATER_LEVEL", "Pump flag", "Alarm flag", "User action",
 ]
+
+# Mirrors the firmware WaterLevelEvent_t enum (main.h):
+#   WATER_LEVEL_NORMAL = 0, WATER_LEVEL_HIGH = 1, WATER_LEVEL_LOW = 2
+_WATER_LEVEL_NAMES = {
+    0: "WATER_LEVEL_NORMAL",
+    1: "WATER_LEVEL_HIGH",
+    2: "WATER_LEVEL_LOW",
+}
+
+
+def water_level_text(value):
+    """Map a raw water_level code to its label, or '--' if unknown/missing."""
+    if value is None:
+        return "--"
+    return _WATER_LEVEL_NAMES.get(value, "--")
 
 
 class TelemetryArchiver:
@@ -28,7 +43,8 @@ class TelemetryArchiver:
     def _snapshot(data: dict):
         return (
             data.get("methane"), data.get("co"), data.get("airflow"),
-            data.get("waterflow"), data.get("pump"), data.get("alarm"),
+            data.get("waterflow"), data.get("water_level"),
+            data.get("pump"), data.get("alarm"),
         )
 
     @staticmethod
@@ -39,6 +55,7 @@ class TelemetryArchiver:
             data.get("co", ""),
             data.get("airflow", ""),
             "FLOW" if data.get("waterflow") else "NO FLOW",
+            water_level_text(data.get("water_level")),
             "ON" if data.get("pump") else "OFF",
             "ACTIVE" if data.get("alarm") else "DEACTIVATED",
             user_action,

@@ -1,5 +1,5 @@
-../Core/Src/task_ui_comms.c:27:6:HAL_UART_RxCpltCallback	24	static
-../Core/Src/task_ui_comms.c:43:19:UIComms_TryReadLine	32	static
-../Core/Src/task_ui_comms.c:67:13:UIComms_HandleLine	16	static
-../Core/Src/task_ui_comms.c:80:13:UIComms_SendTelemetry	248	static
-../Core/Src/task_ui_comms.c:127:6:UICommsTask_Run	112	static
+../Core/Src/task_ui_comms.c:28:6:HAL_UART_RxCpltCallback	24	static
+../Core/Src/task_ui_comms.c:44:19:UIComms_TryReadLine	32	static
+../Core/Src/task_ui_comms.c:68:13:UIComms_HandleLine	16	static
+../Core/Src/task_ui_comms.c:81:13:UIComms_SendTelemetry	296	static
+../Core/Src/task_ui_comms.c:130:6:UICommsTask_Run	112	static

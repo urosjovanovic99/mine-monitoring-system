@@ -11,6 +11,7 @@
 #include "task_alarm_manager.h"
 #include "task_pump_manager.h"
 #include "task_pump_flow.h"
+#include "task_water_level.h"
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
@@ -96,17 +97,19 @@ static void UIComms_SendTelemetry(void)
    * already relies on for activeCauses. */
   alarmSnapshot = alarmCommandedState;
 
-  char buf[160];
+  char buf[192];
   int len = snprintf(buf, sizeof(buf),
       "{\"methane\":%u,\"methane_valid\":%u,"
       "\"co\":%u,\"co_valid\":%u,"
       "\"airflow\":%u,\"airflow_valid\":%u,"
       "\"waterflow\":%u,"
+      "\"water_level\":%u,"
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
 	  (unsigned)waterFlowState,
+	  (unsigned)waterLevelState,
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)
