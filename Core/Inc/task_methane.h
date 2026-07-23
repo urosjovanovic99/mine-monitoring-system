@@ -13,12 +13,8 @@ extern "C" {
 #endif
 
 #define METHANE_CRITICAL_THRESHOLD 1000
-/**
- * @brief  Body of MethaneTask. Called from StartMethaneSensorTask() in
- *         freertos.c.
- * @param  argument: Not used
- * @retval None (never returns)
- */
+#define METHANE_TASK_PERIOD_MS     100U
+
 void MethaneTask_Run(void *argument);
 
 #ifdef __cplusplus

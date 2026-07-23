@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 PumpState_t pumpCommandedState = PUMP_OFF;
+static volatile BaseType_t pumpMethaneInhibit = pdTRUE;
 
 static BaseType_t PumpManager_IsEnvironmentSafe(void)
 {
@@ -52,9 +53,28 @@ static BaseType_t PumpManager_IsEnvironmentSafe(void)
 
 static void PumpManager_ApplyStateLocked(PumpState_t newState)
 {
+  if (pumpMethaneInhibit)
+  {
+    newState = PUMP_OFF;
+  }
+
   HAL_GPIO_WritePin(PUMP_GPIO_Port, PUMP_Pin,
                      (newState == PUMP_ON) ? GPIO_PIN_SET : GPIO_PIN_RESET);
   pumpCommandedState = newState;
+}
+
+void PumpManager_SetMethaneCritical(BaseType_t isCritical)
+{
+  osMutexAcquire(pumpMutexHandle, osWaitForever);
+
+  pumpMethaneInhibit = isCritical;
+
+  if (isCritical)
+  {
+    PumpManager_ApplyStateLocked(PUMP_OFF);
+  }
+
+  osMutexRelease(pumpMutexHandle);
 }
 
 static void PumpManager_SetPumpState(PumpState_t newState)

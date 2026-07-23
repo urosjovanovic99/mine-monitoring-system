@@ -1,5 +1,6 @@
-../Core/Src/task_pump_manager.c:21:19:PumpManager_IsEnvironmentSafe	7
-../Core/Src/task_pump_manager.c:53:13:PumpManager_ApplyStateLocked	1
-../Core/Src/task_pump_manager.c:60:13:PumpManager_SetPumpState	1
-../Core/Src/task_pump_manager.c:67:6:PumpManager_Toggle	1
-../Core/Src/task_pump_manager.c:74:6:PumpManagerTask_Run	8
+../Core/Src/task_pump_manager.c:32:19:PumpManager_IsEnvironmentSafe	7
+../Core/Src/task_pump_manager.c:64:13:PumpManager_ApplyStateLocked	2
+../Core/Src/task_pump_manager.c:76:6:PumpManager_SetMethaneCritical	2
+../Core/Src/task_pump_manager.c:90:13:PumpManager_SetPumpState	1
+../Core/Src/task_pump_manager.c:97:6:PumpManager_Toggle	1
+../Core/Src/task_pump_manager.c:104:6:PumpManagerTask_Run	8

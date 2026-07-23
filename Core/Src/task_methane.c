@@ -7,6 +7,7 @@
 
 #include "task_methane.h"
 #include "task_alarm_manager.h"
+#include "task_pump_manager.h"
 #include "freertos_shared.h"
 #include "sensor_adc.h"
 #include "usart.h"
@@ -16,7 +17,7 @@
 void MethaneTask_Run(void *argument)
 {
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(METHANE_TASK_PERIOD_MS);
   uint16_t methaneValue;
   BaseType_t bConversionOk;
   uint8_t consecutiveErrors = 0;
@@ -35,9 +36,9 @@ void MethaneTask_Run(void *argument)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-    /* This conversion was started >=150 ms ago (max latency is
-       50 ms) -> guaranteed complete. No polling needed for EOC;
-       SR is only consulted for the error bit. */
+    /* This conversion was started one period (100 ms) ago; ADC max
+       latency is 50 ms -> guaranteed complete. No polling needed for
+       EOC; SR is only consulted for the error bit. */
     bConversionOk = ADC_HW_ReadValue(&hadc1, &methaneValue);
 
     /* Immediately displace: start the conversion this reading's
@@ -52,6 +53,16 @@ void MethaneTask_Run(void *argument)
       sharedSensorData.methaneLevel = methaneValue;
       sharedSensorData.methaneValid = pdTRUE;
       osMutexRelease(sensorDataMutexHandle);
+
+      if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
+      {
+        PumpManager_SetMethaneCritical(pdTRUE);
+        AlarmManager_RaiseCause(ALARM_BIT_METHANE);
+      }
+      else
+      {
+        PumpManager_SetMethaneCritical(pdFALSE);
+      }
 #if DEBUG_UART_LOGGING
       osMutexAcquire(uartLogMutexHandle, osWaitForever);
       dbgLen = snprintf(dbgBuf, sizeof(dbgBuf), "CH4 raw=%u tick=%lu\r\n",
@@ -59,10 +70,6 @@ void MethaneTask_Run(void *argument)
       HAL_UART_Transmit(&huart2, (uint8_t *)dbgBuf, dbgLen, 100);
       osMutexRelease(uartLogMutexHandle);
 #endif
-      if (methaneValue >= METHANE_CRITICAL_THRESHOLD)
-      {
-        AlarmManager_RaiseCause(ALARM_BIT_METHANE);
-      }
     }
     else
     {
@@ -76,9 +83,9 @@ void MethaneTask_Run(void *argument)
         consecutiveErrors++;
       }
 
-      /* Spec requirement: 2 consecutive read errors -> alarm */
       if (consecutiveErrors >= 2)
       {
+        PumpManager_SetMethaneCritical(pdTRUE);
         AlarmManager_RaiseCause(ALARM_BIT_METHANE);
       }
     }

@@ -8,6 +8,8 @@
 #ifndef INC_TASK_PUMP_MANAGER_H_
 #define INC_TASK_PUMP_MANAGER_H_
 
+#include "FreeRTOS.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +19,7 @@ extern PumpState_t pumpCommandedState;
 
 void PumpManager_Toggle(void);
 void PumpManagerTask_Run(void *argument);
+void PumpManager_SetMethaneCritical(BaseType_t isCritical);
 
 
 #ifdef __cplusplus
