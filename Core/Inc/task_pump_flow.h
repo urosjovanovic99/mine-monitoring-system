@@ -12,8 +12,9 @@
 extern "C" {
 #endif
 
-#define PUMP_FLOW_N_PERIODS      6      /* N: td = N * 150ms = 900 ms, per spec */
+#define PUMP_FLOW_N_PERIODS      6
 #define WATER_FLOW_ACTIVE_STATE  GPIO_PIN_SET
+#define PUMP_FLOW_TASK_PERIOD_MS     150U
 
 typedef enum { WATER_FLOW_OFF = 0, WATER_FLOW_ON = 1 } WaterFlowState_t;
 extern WaterFlowState_t waterFlowState;

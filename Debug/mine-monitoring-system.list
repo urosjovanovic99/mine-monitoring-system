@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 000013d0  00000000  00000000  000343a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00028f35  00000000  00000000  00035770  2**0
+ 16 .debug_macro  00028f55  00000000  00000000  00035770  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00024039  00000000  00000000  0005e6a5  2**0
+ 17 .debug_line   00024038  00000000  00000000  0005e6c5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000eaef7  00000000  00000000  000826de  2**0
+ 18 .debug_str    000eaf65  00000000  00000000  000826fd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0016d5d5  2**0
+ 19 .comment      00000043  00000000  00000000  0016d662  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00006918  00000000  00000000  0016d618  2**2
+ 20 .debug_frame  00006918  00000000  00000000  0016d6a8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000084  00000000  00000000  00173f30  2**0
+ 21 .debug_line_str 00000084  00000000  00000000  00173fc0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2587,7 +2587,7 @@ void AirFlowTask_Run(void *argument)
  800114c:	af00      	add	r7, sp, #0
  800114e:	6078      	str	r0, [r7, #4]
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(AIRFLOW_TASK_PERIOD_MS);
  8001150:	2396      	movs	r3, #150	@ 0x96
  8001152:	61bb      	str	r3, [r7, #24]
   uint16_t airFlowValue;
@@ -2872,7 +2872,7 @@ void COSensorTask_Run(void *argument)
  80012e0:	af00      	add	r7, sp, #0
  80012e2:	6078      	str	r0, [r7, #4]
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(CO_TASK_PERIOD_MS);
  80012e4:	2396      	movs	r3, #150	@ 0x96
  80012e6:	61bb      	str	r3, [r7, #24]
   uint16_t coValue;
@@ -3167,7 +3167,7 @@ void PumpFlowTask_Run(void *argument)
  8001476:	6078      	str	r0, [r7, #4]
   /* USER CODE BEGIN PumpFlowMonitorTask */
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(PUMP_FLOW_TASK_PERIOD_MS);
  8001478:	2396      	movs	r3, #150	@ 0x96
  800147a:	61fb      	str	r3, [r7, #28]
 
@@ -3362,8 +3362,8 @@ void PumpFlowTask_Run(void *argument)
  80015a0:	200001f4 	.word	0x200001f4
 
 080015a4 <PumpManager_IsEnvironmentSafe>:
- * sub-critical reading. This makes the operator unable to start the pump
- * before the environment is confirmed safe. */
+
+PumpState_t pumpCommandedState = PUMP_OFF;
 static volatile BaseType_t pumpMethaneInhibit = pdTRUE;
 
 static BaseType_t PumpManager_IsEnvironmentSafe(void)
@@ -4127,8 +4127,8 @@ void UICommsTask_Run(void *argument)
  8001a52:	d1f1      	bne.n	8001a38 <UICommsTask_Run+0x18>
     }
 
-    osDelay(200);
- 8001a54:	20c8      	movs	r0, #200	@ 0xc8
+    osDelay(UI_COMMS_TASK_PERIOD_MS);
+ 8001a54:	2096      	movs	r0, #150	@ 0x96
  8001a56:	f003 fb83 	bl	8005160 <osDelay>
     UIComms_SendTelemetry();
  8001a5a:	e7ea      	b.n	8001a32 <UICommsTask_Run+0x12>

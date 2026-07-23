@@ -208,6 +208,7 @@ Discarded input sections
  .group         0x00000000        0xc ./Core/Src/freertos.o
  .group         0x00000000        0xc ./Core/Src/freertos.o
  .group         0x00000000        0xc ./Core/Src/freertos.o
+ .group         0x00000000        0xc ./Core/Src/freertos.o
  .text          0x00000000        0x0 ./Core/Src/freertos.o
  .data          0x00000000        0x0 ./Core/Src/freertos.o
  .bss           0x00000000        0x0 ./Core/Src/freertos.o
@@ -1250,7 +1251,7 @@ Discarded input sections
  .data          0x00000000        0x0 ./Core/Src/task_airflow.o
  .bss           0x00000000        0x0 ./Core/Src/task_airflow.o
  .debug_macro   0x00000000      0xade ./Core/Src/task_airflow.o
- .debug_macro   0x00000000       0x10 ./Core/Src/task_airflow.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/task_airflow.o
  .debug_macro   0x00000000       0x22 ./Core/Src/task_airflow.o
  .debug_macro   0x00000000       0x8e ./Core/Src/task_airflow.o
  .debug_macro   0x00000000       0x51 ./Core/Src/task_airflow.o
@@ -1563,7 +1564,7 @@ Discarded input sections
  .data          0x00000000        0x0 ./Core/Src/task_co_sensor.o
  .bss           0x00000000        0x0 ./Core/Src/task_co_sensor.o
  .debug_macro   0x00000000      0xade ./Core/Src/task_co_sensor.o
- .debug_macro   0x00000000       0x10 ./Core/Src/task_co_sensor.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/task_co_sensor.o
  .debug_macro   0x00000000       0x22 ./Core/Src/task_co_sensor.o
  .debug_macro   0x00000000       0x8e ./Core/Src/task_co_sensor.o
  .debug_macro   0x00000000       0x51 ./Core/Src/task_co_sensor.o
@@ -1881,7 +1882,7 @@ Discarded input sections
  .data          0x00000000        0x0 ./Core/Src/task_pump_flow.o
  .bss           0x00000000        0x0 ./Core/Src/task_pump_flow.o
  .debug_macro   0x00000000      0xade ./Core/Src/task_pump_flow.o
- .debug_macro   0x00000000       0x16 ./Core/Src/task_pump_flow.o
+ .debug_macro   0x00000000       0x1c ./Core/Src/task_pump_flow.o
  .debug_macro   0x00000000       0x22 ./Core/Src/task_pump_flow.o
  .debug_macro   0x00000000       0x8e ./Core/Src/task_pump_flow.o
  .debug_macro   0x00000000       0x51 ./Core/Src/task_pump_flow.o
@@ -2114,8 +2115,8 @@ Discarded input sections
  .debug_macro   0x00000000      0x126 ./Core/Src/task_pump_manager.o
  .debug_macro   0x00000000       0xa0 ./Core/Src/task_pump_manager.o
  .debug_macro   0x00000000       0x16 ./Core/Src/task_pump_manager.o
- .debug_macro   0x00000000       0x10 ./Core/Src/task_pump_manager.o
- .debug_macro   0x00000000       0x10 ./Core/Src/task_pump_manager.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/task_pump_manager.o
+ .debug_macro   0x00000000       0x16 ./Core/Src/task_pump_manager.o
  .debug_macro   0x00000000       0x1c ./Core/Src/task_pump_manager.o
  .debug_macro   0x00000000       0x10 ./Core/Src/task_pump_manager.o
  .debug_macro   0x00000000       0x1c ./Core/Src/task_pump_manager.o
@@ -2201,10 +2202,12 @@ Discarded input sections
  .group         0x00000000        0xc ./Core/Src/task_ui_comms.o
  .group         0x00000000        0xc ./Core/Src/task_ui_comms.o
  .group         0x00000000        0xc ./Core/Src/task_ui_comms.o
+ .group         0x00000000        0xc ./Core/Src/task_ui_comms.o
  .text          0x00000000        0x0 ./Core/Src/task_ui_comms.o
  .data          0x00000000        0x0 ./Core/Src/task_ui_comms.o
  .bss           0x00000000        0x0 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000      0xade ./Core/Src/task_ui_comms.o
+ .debug_macro   0x00000000       0x10 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000      0x190 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x22 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x8e ./Core/Src/task_ui_comms.o
@@ -2276,7 +2279,7 @@ Discarded input sections
  .debug_macro   0x00000000      0x126 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0xa0 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x34 ./Core/Src/task_ui_comms.o
- .debug_macro   0x00000000       0x16 ./Core/Src/task_ui_comms.o
+ .debug_macro   0x00000000       0x1c ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x1c ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x10 ./Core/Src/task_ui_comms.o
  .debug_macro   0x00000000       0x1c ./Core/Src/task_ui_comms.o
@@ -8186,7 +8189,7 @@ LOAD C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_rnglists
                 0x0000138e       0x42 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_macro    0x00000000    0x28f35
+.debug_macro    0x00000000    0x28f55
  .debug_macro   0x00000000      0x20f ./Core/Src/adc.o
  .debug_macro   0x0000020f      0xade ./Core/Src/adc.o
  .debug_macro   0x00000ced      0x2a1 ./Core/Src/adc.o
@@ -8232,105 +8235,106 @@ LOAD C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_macro   0x00020885      0x2aa ./Core/Src/adc.o
  .debug_macro   0x00020b2f      0x126 ./Core/Src/adc.o
  .debug_macro   0x00020c55       0xa0 ./Core/Src/adc.o
- .debug_macro   0x00020cf5      0x3f0 ./Core/Src/freertos.o
- .debug_macro   0x000210e5      0x17c ./Core/Src/freertos.o
- .debug_macro   0x00021261      0x15a ./Core/Src/freertos.o
- .debug_macro   0x000213bb       0xc9 ./Core/Src/freertos.o
- .debug_macro   0x00021484       0x1c ./Core/Src/freertos.o
- .debug_macro   0x000214a0       0x26 ./Core/Src/freertos.o
- .debug_macro   0x000214c6       0x61 ./Core/Src/freertos.o
- .debug_macro   0x00021527       0x2a ./Core/Src/freertos.o
- .debug_macro   0x00021551       0x43 ./Core/Src/freertos.o
- .debug_macro   0x00021594       0x34 ./Core/Src/freertos.o
- .debug_macro   0x000215c8      0x364 ./Core/Src/freertos.o
- .debug_macro   0x0002192c       0x16 ./Core/Src/freertos.o
- .debug_macro   0x00021942       0x4a ./Core/Src/freertos.o
- .debug_macro   0x0002198c       0x34 ./Core/Src/freertos.o
- .debug_macro   0x000219c0       0x10 ./Core/Src/freertos.o
- .debug_macro   0x000219d0       0x58 ./Core/Src/freertos.o
- .debug_macro   0x00021a28       0x8e ./Core/Src/freertos.o
- .debug_macro   0x00021ab6       0x1c ./Core/Src/freertos.o
- .debug_macro   0x00021ad2      0x17e ./Core/Src/freertos.o
- .debug_macro   0x00021c50       0x10 ./Core/Src/freertos.o
- .debug_macro   0x00021c60       0x3c ./Core/Src/freertos.o
- .debug_macro   0x00021c9c      0x4b1 ./Core/Src/freertos.o
- .debug_macro   0x0002214d       0xb5 ./Core/Src/freertos.o
- .debug_macro   0x00022202       0xaa ./Core/Src/freertos.o
- .debug_macro   0x000222ac       0x56 ./Core/Src/freertos.o
- .debug_macro   0x00022302       0x6c ./Core/Src/freertos.o
- .debug_macro   0x0002236e       0x74 ./Core/Src/freertos.o
- .debug_macro   0x000223e2       0xdd ./Core/Src/freertos.o
- .debug_macro   0x000224bf       0x16 ./Core/Src/freertos.o
- .debug_macro   0x000224d5       0x10 ./Core/Src/freertos.o
- .debug_macro   0x000224e5       0x10 ./Core/Src/freertos.o
- .debug_macro   0x000224f5       0x16 ./Core/Src/freertos.o
- .debug_macro   0x0002250b       0x34 ./Core/Src/freertos.o
- .debug_macro   0x0002253f       0x1c ./Core/Src/freertos.o
- .debug_macro   0x0002255b       0x10 ./Core/Src/freertos.o
- .debug_macro   0x0002256b       0x1c ./Core/Src/freertos.o
- .debug_macro   0x00022587       0x16 ./Core/Src/freertos.o
- .debug_macro   0x0002259d      0x146 ./Core/Src/freertos.o
- .debug_macro   0x000226e3      0x20f ./Core/Src/gpio.o
- .debug_macro   0x000228f2      0x367 ./Core/Src/main.o
- .debug_macro   0x00022c59      0x17c ./Core/Src/main.o
- .debug_macro   0x00022dd5       0x66 ./Core/Src/main.o
- .debug_macro   0x00022e3b      0x319 ./Core/Src/sensor_adc.o
- .debug_macro   0x00023154      0x205 ./Core/Src/stm32f4xx_hal_msp.o
- .debug_macro   0x00023359      0x1f6 ./Core/Src/stm32f4xx_hal_timebase_tim.o
- .debug_macro   0x0002354f      0x20f ./Core/Src/stm32f4xx_it.o
- .debug_macro   0x0002375e      0x112 ./Core/Src/sysmem.o
- .debug_macro   0x00023870      0x23c ./Core/Src/sysmem.o
- .debug_macro   0x00023aac      0x1f6 ./Core/Src/system_stm32f4xx.o
- .debug_macro   0x00023ca2      0x3c2 ./Core/Src/task_airflow.o
- .debug_macro   0x00024064       0x2e ./Core/Src/task_airflow.o
- .debug_macro   0x00024092       0x10 ./Core/Src/task_airflow.o
- .debug_macro   0x000240a2       0xf5 ./Core/Src/task_airflow.o
- .debug_macro   0x00024197      0x3b9 ./Core/Src/task_alarm_manager.o
- .debug_macro   0x00024550      0x3c2 ./Core/Src/task_co_sensor.o
- .debug_macro   0x00024912      0x3cc ./Core/Src/task_methane.o
- .debug_macro   0x00024cde      0x3c8 ./Core/Src/task_pump_flow.o
- .debug_macro   0x000250a6      0x3d8 ./Core/Src/task_pump_manager.o
- .debug_macro   0x0002547e      0x406 ./Core/Src/task_ui_comms.o
- .debug_macro   0x00025884       0x16 ./Core/Src/task_ui_comms.o
- .debug_macro   0x0002589a       0x20 ./Core/Src/task_ui_comms.o
- .debug_macro   0x000258ba      0x3ad ./Core/Src/task_water_level.o
- .debug_macro   0x00025c67      0x20f ./Core/Src/usart.o
- .debug_macro   0x00025e76      0x202 ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_macro   0x00026078      0x119 ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_macro   0x00026191       0x22 ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_macro   0x000261b3       0x27 ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_macro   0x000261da      0x256 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
- .debug_macro   0x00026430      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
- .debug_macro   0x00026627      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
- .debug_macro   0x0002681d      0x1fc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
- .debug_macro   0x00026a19      0x1fc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
- .debug_macro   0x00026c15      0x20e ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
- .debug_macro   0x00026e23      0x21a ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
- .debug_macro   0x0002703d      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
- .debug_macro   0x00027233      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
- .debug_macro   0x0002742a      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
- .debug_macro   0x00027620      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_macro   0x00027817      0x3ff ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027c16       0x10 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027c26       0x16 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027c3c       0x91 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027ccd       0x8d ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027d5a       0x9a ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027df4       0x22 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_macro   0x00027e16      0x1f4 ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
- .debug_macro   0x0002800a      0x11c ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
- .debug_macro   0x00028126       0x9b ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
- .debug_macro   0x000281c1      0x199 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_macro   0x0002835a      0x228 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_macro   0x00028582       0x87 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_macro   0x00028609      0x291 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_macro   0x0002889a       0x10 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_macro   0x000288aa      0x1ee ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_macro   0x00028a98       0x97 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_macro   0x00028b2f      0x246 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
- .debug_macro   0x00028d75      0x1c0 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_macro   0x00020cf5      0x3ef ./Core/Src/freertos.o
+ .debug_macro   0x000210e4      0x17c ./Core/Src/freertos.o
+ .debug_macro   0x00021260      0x15a ./Core/Src/freertos.o
+ .debug_macro   0x000213ba       0xc9 ./Core/Src/freertos.o
+ .debug_macro   0x00021483       0x1c ./Core/Src/freertos.o
+ .debug_macro   0x0002149f       0x26 ./Core/Src/freertos.o
+ .debug_macro   0x000214c5       0x61 ./Core/Src/freertos.o
+ .debug_macro   0x00021526       0x2a ./Core/Src/freertos.o
+ .debug_macro   0x00021550       0x43 ./Core/Src/freertos.o
+ .debug_macro   0x00021593       0x34 ./Core/Src/freertos.o
+ .debug_macro   0x000215c7      0x364 ./Core/Src/freertos.o
+ .debug_macro   0x0002192b       0x16 ./Core/Src/freertos.o
+ .debug_macro   0x00021941       0x4a ./Core/Src/freertos.o
+ .debug_macro   0x0002198b       0x34 ./Core/Src/freertos.o
+ .debug_macro   0x000219bf       0x10 ./Core/Src/freertos.o
+ .debug_macro   0x000219cf       0x58 ./Core/Src/freertos.o
+ .debug_macro   0x00021a27       0x8e ./Core/Src/freertos.o
+ .debug_macro   0x00021ab5       0x1c ./Core/Src/freertos.o
+ .debug_macro   0x00021ad1      0x17e ./Core/Src/freertos.o
+ .debug_macro   0x00021c4f       0x10 ./Core/Src/freertos.o
+ .debug_macro   0x00021c5f       0x3c ./Core/Src/freertos.o
+ .debug_macro   0x00021c9b      0x4b1 ./Core/Src/freertos.o
+ .debug_macro   0x0002214c       0xb5 ./Core/Src/freertos.o
+ .debug_macro   0x00022201       0xaa ./Core/Src/freertos.o
+ .debug_macro   0x000222ab       0x56 ./Core/Src/freertos.o
+ .debug_macro   0x00022301       0x6c ./Core/Src/freertos.o
+ .debug_macro   0x0002236d       0x74 ./Core/Src/freertos.o
+ .debug_macro   0x000223e1       0xdd ./Core/Src/freertos.o
+ .debug_macro   0x000224be       0x16 ./Core/Src/freertos.o
+ .debug_macro   0x000224d4       0x16 ./Core/Src/freertos.o
+ .debug_macro   0x000224ea       0x16 ./Core/Src/freertos.o
+ .debug_macro   0x00022500       0x1c ./Core/Src/freertos.o
+ .debug_macro   0x0002251c       0x34 ./Core/Src/freertos.o
+ .debug_macro   0x00022550       0x10 ./Core/Src/freertos.o
+ .debug_macro   0x00022560       0x1c ./Core/Src/freertos.o
+ .debug_macro   0x0002257c       0x10 ./Core/Src/freertos.o
+ .debug_macro   0x0002258c       0x1c ./Core/Src/freertos.o
+ .debug_macro   0x000225a8       0x16 ./Core/Src/freertos.o
+ .debug_macro   0x000225be      0x146 ./Core/Src/freertos.o
+ .debug_macro   0x00022704      0x20f ./Core/Src/gpio.o
+ .debug_macro   0x00022913      0x367 ./Core/Src/main.o
+ .debug_macro   0x00022c7a      0x17c ./Core/Src/main.o
+ .debug_macro   0x00022df6       0x66 ./Core/Src/main.o
+ .debug_macro   0x00022e5c      0x319 ./Core/Src/sensor_adc.o
+ .debug_macro   0x00023175      0x205 ./Core/Src/stm32f4xx_hal_msp.o
+ .debug_macro   0x0002337a      0x1f6 ./Core/Src/stm32f4xx_hal_timebase_tim.o
+ .debug_macro   0x00023570      0x20f ./Core/Src/stm32f4xx_it.o
+ .debug_macro   0x0002377f      0x112 ./Core/Src/sysmem.o
+ .debug_macro   0x00023891      0x23c ./Core/Src/sysmem.o
+ .debug_macro   0x00023acd      0x1f6 ./Core/Src/system_stm32f4xx.o
+ .debug_macro   0x00023cc3      0x3c2 ./Core/Src/task_airflow.o
+ .debug_macro   0x00024085       0x2e ./Core/Src/task_airflow.o
+ .debug_macro   0x000240b3       0x10 ./Core/Src/task_airflow.o
+ .debug_macro   0x000240c3       0xf5 ./Core/Src/task_airflow.o
+ .debug_macro   0x000241b8      0x3b9 ./Core/Src/task_alarm_manager.o
+ .debug_macro   0x00024571      0x3c2 ./Core/Src/task_co_sensor.o
+ .debug_macro   0x00024933      0x3cc ./Core/Src/task_methane.o
+ .debug_macro   0x00024cff      0x3c8 ./Core/Src/task_pump_flow.o
+ .debug_macro   0x000250c7      0x3d8 ./Core/Src/task_pump_manager.o
+ .debug_macro   0x0002549f      0x405 ./Core/Src/task_ui_comms.o
+ .debug_macro   0x000258a4       0x16 ./Core/Src/task_ui_comms.o
+ .debug_macro   0x000258ba       0x20 ./Core/Src/task_ui_comms.o
+ .debug_macro   0x000258da      0x3ad ./Core/Src/task_water_level.o
+ .debug_macro   0x00025c87      0x20f ./Core/Src/usart.o
+ .debug_macro   0x00025e96      0x202 ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_macro   0x00026098      0x119 ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_macro   0x000261b1       0x22 ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_macro   0x000261d3       0x27 ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_macro   0x000261fa      0x256 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+ .debug_macro   0x00026450      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
+ .debug_macro   0x00026647      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+ .debug_macro   0x0002683d      0x1fc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
+ .debug_macro   0x00026a39      0x1fc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+ .debug_macro   0x00026c35      0x20e ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
+ .debug_macro   0x00026e43      0x21a ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+ .debug_macro   0x0002705d      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
+ .debug_macro   0x00027253      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
+ .debug_macro   0x0002744a      0x1f6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
+ .debug_macro   0x00027640      0x1f7 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
+ .debug_macro   0x00027837      0x3ff ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027c36       0x10 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027c46       0x16 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027c5c       0x91 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027ced       0x8d ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027d7a       0x9a ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027e14       0x22 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_macro   0x00027e36      0x1f4 ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
+ .debug_macro   0x0002802a      0x11c ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
+ .debug_macro   0x00028146       0x9b ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
+ .debug_macro   0x000281e1      0x199 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_macro   0x0002837a      0x228 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_macro   0x000285a2       0x87 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_macro   0x00028629      0x291 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_macro   0x000288ba       0x10 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_macro   0x000288ca      0x1ee ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_macro   0x00028ab8       0x97 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_macro   0x00028b4f      0x246 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
+ .debug_macro   0x00028d95      0x1c0 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_line     0x00000000    0x24039
+.debug_line     0x00000000    0x24038
  .debug_line    0x00000000      0x92d ./Core/Src/adc.o
  .debug_line    0x0000092d      0xcd2 ./Core/Src/freertos.o
  .debug_line    0x000015ff      0x7d1 ./Core/Src/gpio.o
@@ -8346,74 +8350,74 @@ LOAD C:/ST/STM32CubeIDE_2.1.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_line    0x00006e50      0xaf3 ./Core/Src/task_co_sensor.o
  .debug_line    0x00007943      0xb09 ./Core/Src/task_methane.o
  .debug_line    0x0000844c      0xb6e ./Core/Src/task_pump_flow.o
- .debug_line    0x00008fba      0xc10 ./Core/Src/task_pump_manager.o
- .debug_line    0x00009bca      0xc55 ./Core/Src/task_ui_comms.o
- .debug_line    0x0000a81f      0xacc ./Core/Src/task_water_level.o
- .debug_line    0x0000b2eb      0x802 ./Core/Src/usart.o
- .debug_line    0x0000baed       0x7a ./Core/Startup/startup_stm32f446retx.o
- .debug_line    0x0000bb67      0xabc ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_line    0x0000c623      0xa86 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
- .debug_line    0x0000d0a9     0x12a6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
- .debug_line    0x0000e34f      0xd53 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
- .debug_line    0x0000f0a2      0xfef ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
- .debug_line    0x00010091      0xbc4 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
- .debug_line    0x00010c55      0x9f0 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
- .debug_line    0x00011645      0xe9e ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
- .debug_line    0x000124e3     0x154f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
- .debug_line    0x00013a32     0x37fe ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
- .debug_line    0x00017230     0x19e3 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
- .debug_line    0x00018c13     0x25cb ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_line    0x0001b1de     0x25ac ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_line    0x0001d78a      0xb84 ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
- .debug_line    0x0001e30e      0x79c ./Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_line    0x0001eaaa     0x1730 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_line    0x000201da     0x1d50 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_line    0x00021f2a      0xe0a ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_line    0x00022d34      0x94d ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
- .debug_line    0x00023681      0x9b8 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_line    0x00008fba      0xc0f ./Core/Src/task_pump_manager.o
+ .debug_line    0x00009bc9      0xc55 ./Core/Src/task_ui_comms.o
+ .debug_line    0x0000a81e      0xacc ./Core/Src/task_water_level.o
+ .debug_line    0x0000b2ea      0x802 ./Core/Src/usart.o
+ .debug_line    0x0000baec       0x7a ./Core/Startup/startup_stm32f446retx.o
+ .debug_line    0x0000bb66      0xabc ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_line    0x0000c622      0xa86 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+ .debug_line    0x0000d0a8     0x12a6 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
+ .debug_line    0x0000e34e      0xd53 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+ .debug_line    0x0000f0a1      0xfef ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
+ .debug_line    0x00010090      0xbc4 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+ .debug_line    0x00010c54      0x9f0 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
+ .debug_line    0x00011644      0xe9e ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+ .debug_line    0x000124e2     0x154f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
+ .debug_line    0x00013a31     0x37fe ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
+ .debug_line    0x0001722f     0x19e3 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
+ .debug_line    0x00018c12     0x25cb ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
+ .debug_line    0x0001b1dd     0x25ac ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_line    0x0001d789      0xb84 ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
+ .debug_line    0x0001e30d      0x79c ./Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_line    0x0001eaa9     0x1730 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_line    0x000201d9     0x1d50 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_line    0x00021f29      0xe0a ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_line    0x00022d33      0x94d ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
+ .debug_line    0x00023680      0x9b8 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_str      0x00000000    0xeaef7
- .debug_str     0x00000000    0xeaef7 ./Core/Src/adc.o
+.debug_str      0x00000000    0xeaf65
+ .debug_str     0x00000000    0xeaf65 ./Core/Src/adc.o
                               0xd657e (size before relaxing)
- .debug_str     0x000eaef7    0xdf1cd ./Core/Src/freertos.o
- .debug_str     0x000eaef7    0xd6647 ./Core/Src/gpio.o
- .debug_str     0x000eaef7    0xde321 ./Core/Src/main.o
- .debug_str     0x000eaef7    0xdc45b ./Core/Src/sensor_adc.o
- .debug_str     0x000eaef7    0xd6569 ./Core/Src/stm32f4xx_hal_msp.o
- .debug_str     0x000eaef7    0xd698f ./Core/Src/stm32f4xx_hal_timebase_tim.o
- .debug_str     0x000eaef7    0xd6737 ./Core/Src/stm32f4xx_it.o
- .debug_str     0x000eaef7     0x7745 ./Core/Src/sysmem.o
- .debug_str     0x000eaef7    0xd5e67 ./Core/Src/system_stm32f4xx.o
- .debug_str     0x000eaef7    0xde710 ./Core/Src/task_airflow.o
- .debug_str     0x000eaef7    0xde269 ./Core/Src/task_alarm_manager.o
- .debug_str     0x000eaef7    0xde710 ./Core/Src/task_co_sensor.o
- .debug_str     0x000eaef7    0xde76a ./Core/Src/task_methane.o
- .debug_str     0x000eaef7    0xde3f5 ./Core/Src/task_pump_flow.o
- .debug_str     0x000eaef7    0xde525 ./Core/Src/task_pump_manager.o
- .debug_str     0x000eaef7    0xde9df ./Core/Src/task_ui_comms.o
- .debug_str     0x000eaef7    0xde0dc ./Core/Src/task_water_level.o
- .debug_str     0x000eaef7    0xd6b18 ./Core/Src/usart.o
- .debug_str     0x000eaef7       0xa0 ./Core/Startup/startup_stm32f446retx.o
- .debug_str     0x000eaef7     0xd619 ./Core/ThreadSafe/newlib_lock_glue.o
- .debug_str     0x000eaef7    0xd6a2c ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
- .debug_str     0x000eaef7    0xd642f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
- .debug_str     0x000eaef7    0xd6783 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
- .debug_str     0x000eaef7    0xd625c ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
- .debug_str     0x000eaef7    0xd5fe2 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
- .debug_str     0x000eaef7    0xd603f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
- .debug_str     0x000eaef7    0xd62a0 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
- .debug_str     0x000eaef7    0xd62d3 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
- .debug_str     0x000eaef7    0xd71cc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
- .debug_str     0x000eaef7    0xd69d8 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
- .debug_str     0x000eaef7    0xd6857 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_str     0x000eaef7    0xe0e5b ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_str     0x000eaef7     0xc08f ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
- .debug_str     0x000eaef7     0xabf6 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_str     0x000eaef7     0xc736 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_str     0x000eaef7     0xd6e6 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_str     0x000eaef7     0xcf87 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_str     0x000eaef7     0xb934 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
- .debug_str     0x000eaef7     0xb555 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_str     0x000eaf65    0xdf23b ./Core/Src/freertos.o
+ .debug_str     0x000eaf65    0xd6647 ./Core/Src/gpio.o
+ .debug_str     0x000eaf65    0xde321 ./Core/Src/main.o
+ .debug_str     0x000eaf65    0xdc45b ./Core/Src/sensor_adc.o
+ .debug_str     0x000eaf65    0xd6569 ./Core/Src/stm32f4xx_hal_msp.o
+ .debug_str     0x000eaf65    0xd698f ./Core/Src/stm32f4xx_hal_timebase_tim.o
+ .debug_str     0x000eaf65    0xd6737 ./Core/Src/stm32f4xx_it.o
+ .debug_str     0x000eaf65     0x7745 ./Core/Src/sysmem.o
+ .debug_str     0x000eaf65    0xd5e67 ./Core/Src/system_stm32f4xx.o
+ .debug_str     0x000eaf65    0xde72c ./Core/Src/task_airflow.o
+ .debug_str     0x000eaf65    0xde269 ./Core/Src/task_alarm_manager.o
+ .debug_str     0x000eaf65    0xde727 ./Core/Src/task_co_sensor.o
+ .debug_str     0x000eaf65    0xde76a ./Core/Src/task_methane.o
+ .debug_str     0x000eaf65    0xde413 ./Core/Src/task_pump_flow.o
+ .debug_str     0x000eaf65    0xde558 ./Core/Src/task_pump_manager.o
+ .debug_str     0x000eaf65    0xdea1a ./Core/Src/task_ui_comms.o
+ .debug_str     0x000eaf65    0xde0dc ./Core/Src/task_water_level.o
+ .debug_str     0x000eaf65    0xd6b18 ./Core/Src/usart.o
+ .debug_str     0x000eaf65       0xa0 ./Core/Startup/startup_stm32f446retx.o
+ .debug_str     0x000eaf65     0xd619 ./Core/ThreadSafe/newlib_lock_glue.o
+ .debug_str     0x000eaf65    0xd6a2c ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+ .debug_str     0x000eaf65    0xd642f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
+ .debug_str     0x000eaf65    0xd6783 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+ .debug_str     0x000eaf65    0xd625c ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o
+ .debug_str     0x000eaf65    0xd5fe2 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+ .debug_str     0x000eaf65    0xd603f ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o
+ .debug_str     0x000eaf65    0xd62a0 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+ .debug_str     0x000eaf65    0xd62d3 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
+ .debug_str     0x000eaf65    0xd71cc ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
+ .debug_str     0x000eaf65    0xd69d8 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
+ .debug_str     0x000eaf65    0xd6857 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
+ .debug_str     0x000eaf65    0xe0e5b ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_str     0x000eaf65     0xc08f ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o
+ .debug_str     0x000eaf65     0xabf6 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_str     0x000eaf65     0xc736 ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_str     0x000eaf65     0xd6e6 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_str     0x000eaf65     0xcf87 ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_str     0x000eaf65     0xb934 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
+ .debug_str     0x000eaf65     0xb555 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Core/Src/adc.o

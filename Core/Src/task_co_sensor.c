@@ -16,7 +16,7 @@
 void COSensorTask_Run(void *argument)
 {
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(CO_TASK_PERIOD_MS);
   uint16_t coValue;
   BaseType_t bConversionOk;
   uint8_t consecutiveErrors = 0;

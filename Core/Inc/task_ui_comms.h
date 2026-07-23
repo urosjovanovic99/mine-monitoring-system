@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+#define UI_COMMS_TASK_PERIOD_MS     150U
 
 void UICommsTask_Run(void *argument);
 

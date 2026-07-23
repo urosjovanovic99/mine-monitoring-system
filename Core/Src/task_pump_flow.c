@@ -18,7 +18,7 @@ void PumpFlowTask_Run(void *argument)
 {
   /* USER CODE BEGIN PumpFlowMonitorTask */
   TickType_t xLastWakeTime;
-  const TickType_t xPeriod = pdMS_TO_TICKS(150);
+  const TickType_t xPeriod = pdMS_TO_TICKS(PUMP_FLOW_TASK_PERIOD_MS);
 
   PumpState_t lastObservedCommand = PUMP_OFF;
   PumpState_t targetCommand       = PUMP_OFF;

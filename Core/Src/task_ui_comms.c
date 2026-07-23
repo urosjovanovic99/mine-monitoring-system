@@ -139,6 +139,6 @@ void UICommsTask_Run(void *argument)
       UIComms_HandleLine(line);
     }
 
-    osDelay(200);
+    osDelay(UI_COMMS_TASK_PERIOD_MS);
   }
 }
