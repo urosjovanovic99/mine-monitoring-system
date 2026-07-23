@@ -11,22 +11,16 @@
 
 void WaterLevelTask_Run(void *argument)
 {
-  uint32_t lastEventTick = 0U;
-  uint8_t  hasAccepted   = 0U;
+  uint32_t          lastEventTick = 0U;
+  WaterLevelEvent_t lastEvent     = WATER_LEVEL_NORMAL;
+  uint8_t           hasAccepted   = 0U;
 
   /* Infinite loop */
   for (;;)
   {
     if (osSemaphoreAcquire(waterLevelSemaphoreHandle, osWaitForever) == osOK)
     {
-      uint32_t now = osKernelGetTickCount();
-      if (hasAccepted && (now - lastEventTick) < WATER_LEVEL_DEBOUNCE_MS)
-      {
-        continue; /* bounce - ignore this release */
-      }
-      lastEventTick = now;
-      hasAccepted   = 1U;
-
+      /* Read the current level FIRST, then classify. */
       GPIO_PinState highSet = HAL_GPIO_ReadPin(HIGH_WATER_GPIO_Port, HIGH_WATER_Pin);
       GPIO_PinState lowSet  = HAL_GPIO_ReadPin(LOW_WATER_GPIO_Port, LOW_WATER_Pin);
 
@@ -43,6 +37,15 @@ void WaterLevelTask_Run(void *argument)
       {
         evt = WATER_LEVEL_NORMAL;
       }
+
+      uint32_t now = osKernelGetTickCount();
+      if (hasAccepted && evt == lastEvent && (now - lastEventTick) < WATER_LEVEL_DEBOUNCE_MS)
+      {
+        continue; /* same state within debounce window - ignore bounce */
+      }
+      lastEventTick = now;
+      lastEvent     = evt;
+      hasAccepted   = 1U;
 
       osMessageQueuePut(pumpCommandQueueHandle, &evt, 0, 0);
     }

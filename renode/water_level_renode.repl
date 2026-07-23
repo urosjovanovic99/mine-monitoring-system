@@ -11,3 +11,15 @@ lowWaterButton: Miscellaneous.Button @ gpioPortC
 waterFlowSwitch: Miscellaneous.Button @ gpioPortB
     -> gpioPortB@1
     // add "invert: true" here if your high-level switch is active-low
+
+// --- Fix EXTI line collision ---
+// The base stm32f4 platform wires every GPIO port's pin N to EXTI line N and does
+// NOT model SYSCFG port selection. That makes PB0 (PUMP) and PB1 (WATER_FLOW_SENSOR)
+// share EXTI lines 0 and 1 with PC0 (HIGH_WATER) and PC1 (LOW_WATER). With the flow
+// switch held, PB1 pins EXTI line 1 high, so the LOW_WATER button (PC1) produces no
+// edge and EXTI1 never fires. On real hardware PB0/PB1 are not EXTI sources, so
+// disconnect them from the EXTI controller here. The pins are still readable via
+// their GPIO IDR (the polled flow sensor keeps working).
+gpioPortB:
+    0 -> none
+    1 -> none
