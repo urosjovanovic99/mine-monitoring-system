@@ -33,6 +33,11 @@ extern osSemaphoreId_t    waterLevelSemaphoreHandle;
 extern osMutexId_t 		  pumpMutexHandle;
 extern osEventFlagsId_t	  alarmEventFlagsHandle;
 
+#ifdef SIMULATION_BUILD
+/* Guards the interactive-simulation state in sim_env.c. */
+extern osMutexId_t        simMutexHandle;
+#endif
+
 /* Latest readings from all sensor tasks, guarded by sensorDataMutexHandle. */
 extern SharedSensorData_t sharedSensorData;
 

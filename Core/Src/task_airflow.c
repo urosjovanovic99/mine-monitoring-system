@@ -28,7 +28,7 @@ void AirFlowTask_Run(void *argument)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-    bConversionOk = ADC_HW_ReadValue(&hadc3, &airFlowValue);
+    bConversionOk = Sensor_ReadWithFaults(SIM_SENSOR_AIRFLOW, &hadc3, &airFlowValue);
     ADC_HW_StartConversion(&hadc3);
 
     if (bConversionOk)

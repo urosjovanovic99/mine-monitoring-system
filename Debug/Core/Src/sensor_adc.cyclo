@@ -1,2 +1,3 @@
 ../Core/Src/sensor_adc.c:10:6:ADC_HW_StartConversion	1
 ../Core/Src/sensor_adc.c:15:12:ADC_HW_ReadValue	2
+../Core/Src/sensor_adc.c:25:12:Sensor_ReadWithFaults	2

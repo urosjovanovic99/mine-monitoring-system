@@ -42,11 +42,12 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/freertos_shared.h ../Core/Inc/sensor_adc.h ../Core/Inc/adc.h \
- ../Core/Inc/main.h ../Core/Inc/task_water_level.h \
- ../Core/Inc/task_methane.h ../Core/Inc/task_co_sensor.h \
- ../Core/Inc/task_airflow.h ../Core/Inc/task_pump_flow.h \
- ../Core/Inc/task_pump_manager.h ../Core/Inc/task_alarm_manager.h \
- ../Core/Inc/task_ui_comms.h ../Core/Inc/usart.h
+ ../Core/Inc/main.h ../Core/Inc/sim_env.h ../Core/Inc/task_pump_manager.h \
+ ../Core/Inc/task_water_level.h ../Core/Inc/task_methane.h \
+ ../Core/Inc/task_co_sensor.h ../Core/Inc/task_airflow.h \
+ ../Core/Inc/task_pump_flow.h ../Core/Inc/task_pump_manager.h \
+ ../Core/Inc/task_alarm_manager.h ../Core/Inc/task_ui_comms.h \
+ ../Core/Inc/sim_env.h ../Core/Inc/usart.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -94,6 +95,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/sensor_adc.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
+../Core/Inc/sim_env.h:
+../Core/Inc/task_pump_manager.h:
 ../Core/Inc/task_water_level.h:
 ../Core/Inc/task_methane.h:
 ../Core/Inc/task_co_sensor.h:
@@ -102,4 +105,5 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/task_pump_manager.h:
 ../Core/Inc/task_alarm_manager.h:
 ../Core/Inc/task_ui_comms.h:
+../Core/Inc/sim_env.h:
 ../Core/Inc/usart.h:

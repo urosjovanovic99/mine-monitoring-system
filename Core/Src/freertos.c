@@ -34,6 +34,7 @@
 #include "task_pump_manager.h"
 #include "task_alarm_manager.h"
 #include "task_ui_comms.h"
+#include "sim_env.h"
 #include "usart.h"
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -59,6 +60,23 @@
  * handles below are CubeMX-owned; every task file pulls this in via
  * freertos_shared.h (extern SharedSensorData_t sharedSensorData;). */
 SharedSensorData_t sharedSensorData;
+
+#ifdef SIMULATION_BUILD
+/* Interactive-simulation objects (fault injection + water-tank plant).
+ * Defined here alongside the other RTOS handles, created in the USER CODE
+ * sections of MX_FREERTOS_Init() so a CubeMX regeneration leaves them intact. */
+osMutexId_t simMutexHandle;
+const osMutexAttr_t simMutex_attributes = {
+  .name = "simMutex"
+};
+
+osThreadId_t SimTankTaskHandle;
+const osThreadAttr_t SimTankTask_attributes = {
+  .name = "SimTankTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,   /* test scaffolding: lowest tier */
+};
+#endif /* SIMULATION_BUILD */
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -156,7 +174,9 @@ const osEventFlagsAttr_t alarmEventFlags_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+#ifdef SIMULATION_BUILD
+void StartSimTankTask(void *argument);
+#endif
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -210,7 +230,9 @@ void vApplicationMallocFailedHook(void)
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-
+#ifdef SIMULATION_BUILD
+  Sim_Init();
+#endif
   /* USER CODE END Init */
   /* Create the mutex(es) */
   /* creation of sensorDataMutex */
@@ -223,7 +245,9 @@ void MX_FREERTOS_Init(void) {
   pumpMutexHandle = osMutexNew(&pumpMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+#ifdef SIMULATION_BUILD
+  simMutexHandle = osMutexNew(&simMutex_attributes);
+#endif
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
@@ -275,7 +299,9 @@ void MX_FREERTOS_Init(void) {
   UICommsTaskHandle = osThreadNew(StartUICommsTask, NULL, &UICommsTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+#ifdef SIMULATION_BUILD
+  SimTankTaskHandle = osThreadNew(StartSimTankTask, NULL, &SimTankTask_attributes);
+#endif
   /* USER CODE END RTOS_THREADS */
 
   /* creation of alarmEventFlags */
@@ -419,5 +445,14 @@ void StartUICommsTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+#ifdef SIMULATION_BUILD
+/* Water-tank plant task: see sim_env.c. Runs only in a SIMULATION_BUILD; it is
+ * test scaffolding and must be excluded from the Zadatak 3 schedulability
+ * analysis of the real controller. */
+void StartSimTankTask(void *argument)
+{
+  SimTankTask_Run(argument);
+}
+#endif
 /* USER CODE END Application */
 

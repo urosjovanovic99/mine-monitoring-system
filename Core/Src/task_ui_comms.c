@@ -15,8 +15,10 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
+#include "sim_env.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* ---- RX ring buffer, filled from HAL_UART_RxCpltCallback -------------- */
 #define UI_RX_RING_SIZE   128
@@ -65,16 +67,101 @@ static BaseType_t UIComms_TryReadLine(char *line, size_t maxLen)
   return pdFALSE;
 }
 
+#ifdef SIMULATION_BUILD
+/* Minimal JSON-value extractors. The UI emits flat, well-formed single-line
+ * objects, so a full parser is overkill; these locate a "key" and read the
+ * numeric literal that follows it. Return pdFALSE if the key is absent. */
+static BaseType_t UIComms_FindLong(const char *line, const char *key, long *out)
+{
+  const char *p = strstr(line, key);
+  if (p == NULL) { return pdFALSE; }
+  p += strlen(key);
+  while (*p != '\0' && *p != '-' && (*p < '0' || *p > '9')) { p++; }
+  if (*p == '\0') { return pdFALSE; }
+  *out = strtol(p, NULL, 10);
+  return pdTRUE;
+}
+
+static BaseType_t UIComms_FindFloat(const char *line, const char *key, float *out)
+{
+  const char *p = strstr(line, key);
+  if (p == NULL) { return pdFALSE; }
+  p += strlen(key);
+  while (*p != '\0' && *p != '-' && *p != '.' && (*p < '0' || *p > '9')) { p++; }
+  if (*p == '\0') { return pdFALSE; }
+  *out = strtof(p, NULL);
+  return pdTRUE;
+}
+
+/* Map the "sensor" string value onto a SimSensor_t. Checks the longer,
+ * unambiguous names before the "co" substring. */
+static BaseType_t UIComms_FindSensor(const char *line, SimSensor_t *out)
+{
+  const char *p = strstr(line, "\"sensor\"");
+  if (p == NULL) { return pdFALSE; }
+  if (strstr(p, "methane") != NULL) { *out = SIM_SENSOR_METHANE; return pdTRUE; }
+  if (strstr(p, "airflow") != NULL) { *out = SIM_SENSOR_AIRFLOW; return pdTRUE; }
+  if (strstr(p, "co")      != NULL) { *out = SIM_SENSOR_CO;      return pdTRUE; }
+  return pdFALSE;
+}
+#endif /* SIMULATION_BUILD */
+
 static void UIComms_HandleLine(const char *line)
 {
-  if (strstr(line, "\"cmd\"") != NULL && strstr(line, "ALARM_ACK") != NULL)
+  if (strstr(line, "\"cmd\"") == NULL)
+  {
+    return; /* not a command frame */
+  }
+
+  if (strstr(line, "ALARM_ACK") != NULL)
   {
     AlarmManager_Acknowledge();
+    return;
   }
-  else if (strstr(line, "\"cmd\"") != NULL && strstr(line, "PUMP_TOGGLE") != NULL)
+  if (strstr(line, "PUMP_TOGGLE") != NULL)
   {
     PumpManager_Toggle();
+    return;
   }
+
+#ifdef SIMULATION_BUILD
+  /* Interactive fault / timing injection from the operator console. */
+  if (strstr(line, "SIM_FAIL_PCT") != NULL)
+  {
+    SimSensor_t sensor;
+    long        pct;
+    if (UIComms_FindSensor(line, &sensor) && UIComms_FindLong(line, "\"pct\"", &pct))
+    {
+      if (pct < 0)   { pct = 0; }
+      if (pct > 100) { pct = 100; }
+      Sim_SetFailPercent(sensor, (uint8_t)pct);
+    }
+    return;
+  }
+  if (strstr(line, "SIM_FORCE_FAIL") != NULL)
+  {
+    SimSensor_t sensor;
+    long        n;
+    if (UIComms_FindSensor(line, &sensor) && UIComms_FindLong(line, "\"n\"", &n))
+    {
+      if (n < 0)     { n = 0; }
+      if (n > 65535) { n = 65535; }
+      Sim_ForceFail(sensor, (uint16_t)n);
+    }
+    return;
+  }
+  if (strstr(line, "SIM_WATER_RATE") != NULL)
+  {
+    float fill, drain;
+    if (UIComms_FindFloat(line, "\"fill\"", &fill) &&
+        UIComms_FindFloat(line, "\"drain\"", &drain))
+    {
+      Sim_SetWaterRates(fill, drain);
+    }
+    return;
+  }
+#endif /* SIMULATION_BUILD */
+
   /* Unknown/partial commands are ignored - keep this task non-blocking. */
 }
 
@@ -97,19 +184,27 @@ static void UIComms_SendTelemetry(void)
    * already relies on for activeCauses. */
   alarmSnapshot = alarmCommandedState;
 
-  char buf[192];
+#ifdef SIMULATION_BUILD
+  unsigned tankPct = (unsigned)Sim_TankLevelPct();
+#else
+  unsigned tankPct = 0u;
+#endif
+
+  char buf[224];
   int len = snprintf(buf, sizeof(buf),
       "{\"methane\":%u,\"methane_valid\":%u,"
       "\"co\":%u,\"co_valid\":%u,"
       "\"airflow\":%u,\"airflow_valid\":%u,"
       "\"waterflow\":%u,"
       "\"water_level\":%u,"
+      "\"tank_level\":%u,"
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
 	  (unsigned)waterFlowState,
 	  (unsigned)waterLevelState,
+	  tankPct,
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)

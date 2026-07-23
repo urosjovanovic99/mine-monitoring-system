@@ -4,7 +4,7 @@ from datetime import datetime
 
 COLUMNS = [
     "Timestamp", "CH4", "CO", "Air Flow",
-    "Pump water flow", "WATER_LEVEL", "Pump flag", "Alarm flag", "User action",
+    "Pump water flow", "WATER_LEVEL", "Tank level %", "Pump flag", "Alarm flag", "User action",
 ]
 
 # Mirrors the firmware WaterLevelEvent_t enum (main.h):
@@ -43,7 +43,7 @@ class TelemetryArchiver:
     def _snapshot(data: dict):
         return (
             data.get("methane"), data.get("co"), data.get("airflow"),
-            data.get("waterflow"), data.get("water_level"),
+            data.get("waterflow"), data.get("water_level"), data.get("tank_level"),
             data.get("pump"), data.get("alarm"),
         )
 
@@ -56,6 +56,7 @@ class TelemetryArchiver:
             data.get("airflow", ""),
             "FLOW" if data.get("waterflow") else "NO FLOW",
             water_level_text(data.get("water_level")),
+            data.get("tank_level", ""),
             "ON" if data.get("pump") else "OFF",
             "ACTIVE" if data.get("alarm") else "DEACTIVATED",
             user_action,

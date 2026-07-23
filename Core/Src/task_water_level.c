@@ -8,6 +8,7 @@
 #include "task_water_level.h"
 #include "freertos_shared.h"
 #include "cmsis_os.h"
+#include "sim_env.h"
 
 volatile WaterLevelEvent_t waterLevelState = WATER_LEVEL_NORMAL;
 
@@ -23,10 +24,18 @@ void WaterLevelTask_Run(void *argument)
     if (osSemaphoreAcquire(waterLevelSemaphoreHandle, osWaitForever) == osOK)
     {
       /* Read the current level FIRST, then classify. */
+      WaterLevelEvent_t evt;
+#ifdef SIMULATION_BUILD
+      /* The water-tank plant model stands in for the physical HIGH/LOW
+       * detectors. SimTankTask releases waterLevelSemaphoreHandle on every
+       * threshold crossing (exactly as the EXTI ISR would), so everything
+       * below - debounce, telemetry publish, pumpCommandQueue post - is
+       * unchanged; only the source of the reading differs. */
+      evt = Sim_TankClassify();
+#else
       GPIO_PinState highSet = HAL_GPIO_ReadPin(HIGH_WATER_GPIO_Port, HIGH_WATER_Pin);
       GPIO_PinState lowSet  = HAL_GPIO_ReadPin(LOW_WATER_GPIO_Port, LOW_WATER_Pin);
 
-      WaterLevelEvent_t evt;
       if (highSet == GPIO_PIN_SET)
       {
         evt = WATER_LEVEL_HIGH;
@@ -39,6 +48,7 @@ void WaterLevelTask_Run(void *argument)
       {
         evt = WATER_LEVEL_NORMAL;
       }
+#endif
 
       uint32_t now = osKernelGetTickCount();
       if (hasAccepted && evt == lastEvent && (now - lastEventTick) < WATER_LEVEL_DEBOUNCE_MS)

@@ -1,5 +1,8 @@
-../Core/Src/task_ui_comms.c:28:6:HAL_UART_RxCpltCallback	24	static
-../Core/Src/task_ui_comms.c:44:19:UIComms_TryReadLine	32	static
-../Core/Src/task_ui_comms.c:68:13:UIComms_HandleLine	16	static
-../Core/Src/task_ui_comms.c:81:13:UIComms_SendTelemetry	296	static
-../Core/Src/task_ui_comms.c:130:6:UICommsTask_Run	112	static
+../Core/Src/task_ui_comms.c:30:6:HAL_UART_RxCpltCallback	24	static
+../Core/Src/task_ui_comms.c:46:19:UIComms_TryReadLine	32	static
+../Core/Src/task_ui_comms.c:74:19:UIComms_FindLong	32	static
+../Core/Src/task_ui_comms.c:85:19:UIComms_FindFloat	32	static
+../Core/Src/task_ui_comms.c:98:19:UIComms_FindSensor	24	static
+../Core/Src/task_ui_comms.c:109:13:UIComms_HandleLine	40	static
+../Core/Src/task_ui_comms.c:168:13:UIComms_SendTelemetry	328	static
+../Core/Src/task_ui_comms.c:225:6:UICommsTask_Run	112	static

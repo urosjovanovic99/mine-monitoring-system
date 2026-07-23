@@ -35,7 +35,7 @@ void MethaneTask_Run(void *argument)
     /* This conversion was started one period (100 ms) ago; ADC max
        latency is 50 ms -> guaranteed complete. No polling needed for
        EOC; SR is only consulted for the error bit. */
-    bConversionOk = ADC_HW_ReadValue(&hadc1, &methaneValue);
+    bConversionOk = Sensor_ReadWithFaults(SIM_SENSOR_METHANE, &hadc1, &methaneValue);
 
     /* Immediately displace: start the conversion this reading's
        "successor" will consume next period. */

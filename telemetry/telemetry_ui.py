@@ -5,6 +5,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QPushButton, QHBoxLayout, QStatusBar,
+    QGroupBox, QSpinBox, QDoubleSpinBox, QGridLayout,
 )
 
 from telemetry_logger import TelemetryArchiver, water_level_text
@@ -86,7 +87,7 @@ class DashboardWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mine Monitoring - Telemetry")
-        self.resize(520, 260)
+        self.resize(560, 520)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -118,9 +119,12 @@ class DashboardWindow(QMainWindow):
         self.water_level_label = QLabel("--")
         self.water_level_label.setAlignment(Qt.AlignCenter)
         self.water_level_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.tank_level_label = QLabel("-- %")
+        self.tank_level_label.setAlignment(Qt.AlignCenter)
         water_panel.addStretch(1)
         water_panel.addWidget(water_title)
         water_panel.addWidget(self.water_level_label)
+        water_panel.addWidget(self.tank_level_label)
         water_panel.addStretch(1)
         top.addLayout(water_panel)
 
@@ -132,6 +136,8 @@ class DashboardWindow(QMainWindow):
         buttons.addWidget(self.ack_btn)
         buttons.addWidget(self.pump_switch)
         layout.addLayout(buttons)
+
+        layout.addWidget(self._build_sim_panel())
 
         self.status = QStatusBar()
         self.setStatusBar(self.status)
@@ -146,6 +152,85 @@ class DashboardWindow(QMainWindow):
         self.pump_switch.clicked.connect(self.on_pump_switch_clicked)
 
         self.client.start()
+
+    def _build_sim_panel(self):
+        """Interactive simulation controls (Zadatak 2: setting timing
+        characteristics and fault situations). All controls send JSON commands
+        to the MCU over the same socket used for pump/alarm commands."""
+        box = QGroupBox("Simulation control")
+        grid = QGridLayout(box)
+
+        # --- water-tank change rate (timing characteristic) ---
+        grid.addWidget(QLabel("<b>Water tank</b>"), 0, 0, 1, 4)
+
+        self.fill_spin = QDoubleSpinBox()
+        self.fill_spin.setRange(0.0, 50.0)
+        self.fill_spin.setSingleStep(0.5)
+        self.fill_spin.setValue(1.0)
+        self.fill_spin.setSuffix(" %/s")
+        self.drain_spin = QDoubleSpinBox()
+        self.drain_spin.setRange(0.0, 50.0)
+        self.drain_spin.setSingleStep(0.5)
+        self.drain_spin.setValue(3.0)
+        self.drain_spin.setSuffix(" %/s")
+        rates_btn = QPushButton("Apply rates")
+        rates_btn.clicked.connect(self.on_apply_rates)
+
+        grid.addWidget(QLabel("Fill (pump off):"), 1, 0)
+        grid.addWidget(self.fill_spin, 1, 1)
+        grid.addWidget(QLabel("Drain (pump on):"), 1, 2)
+        grid.addWidget(self.drain_spin, 1, 3)
+        grid.addWidget(rates_btn, 2, 0, 1, 4)
+
+        # --- per-sensor read-failure injection (fault situation) ---
+        grid.addWidget(QLabel("<b>Sensor read faults</b>"), 3, 0, 1, 4)
+        grid.addWidget(QLabel("fail %"), 4, 1)
+        grid.addWidget(QLabel("force N"), 4, 3)
+
+        self.fail_pct_spins = {}
+        self.force_spins = {}
+        sensors = [("Methane", "methane"), ("CO", "co"), ("Airflow", "airflow")]
+        for i, (label, key) in enumerate(sensors):
+            row = 5 + i
+            grid.addWidget(QLabel(label + ":"), row, 0)
+
+            pct = QSpinBox()
+            pct.setRange(0, 100)
+            pct.setSuffix(" %")
+            self.fail_pct_spins[key] = pct
+            pct_btn = QPushButton("Set")
+            pct_btn.clicked.connect(lambda _, k=key: self.on_apply_fail_pct(k))
+            grid.addWidget(pct, row, 1)
+            grid.addWidget(pct_btn, row, 2)
+
+            force = QSpinBox()
+            force.setRange(0, 1000)
+            force.setValue(2)
+            self.force_spins[key] = force
+            force_btn = QPushButton("Force")
+            force_btn.clicked.connect(lambda _, k=key: self.on_force_fail(k))
+            grid.addWidget(force, row, 3)
+            grid.addWidget(force_btn, row, 4)
+
+        return box
+
+    def on_apply_rates(self):
+        cmd = {"cmd": "SIM_WATER_RATE",
+               "fill": round(self.fill_spin.value(), 2),
+               "drain": round(self.drain_spin.value(), 2)}
+        self.archiver.log_user_action(
+            f"SIM_WATER_RATE fill={cmd['fill']} drain={cmd['drain']}")
+        self.client.send_command(cmd)
+
+    def on_apply_fail_pct(self, sensor):
+        pct = self.fail_pct_spins[sensor].value()
+        self.archiver.log_user_action(f"SIM_FAIL_PCT {sensor}={pct}")
+        self.client.send_command({"cmd": "SIM_FAIL_PCT", "sensor": sensor, "pct": pct})
+
+    def on_force_fail(self, sensor):
+        n = self.force_spins[sensor].value()
+        self.archiver.log_user_action(f"SIM_FORCE_FAIL {sensor}={n}")
+        self.client.send_command({"cmd": "SIM_FORCE_FAIL", "sensor": sensor, "n": n})
 
     def on_ack_clicked(self):
         self.archiver.log_user_action("ALARM_ACK")
@@ -170,6 +255,8 @@ class DashboardWindow(QMainWindow):
         self.pump_label.setText("ON" if data.get('pump') else "OFF")
         self.alarm_label.setText("ACTIVE" if data.get('alarm') else "DEACTIVATED")
         self.water_level_label.setText(water_level_text(data.get('water_level')))
+        tank = data.get('tank_level')
+        self.tank_level_label.setText("-- %" if tank is None else f"tank: {tank} %")
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

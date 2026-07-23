@@ -10,6 +10,7 @@ C_SRCS += \
 ../Core/Src/gpio.c \
 ../Core/Src/main.c \
 ../Core/Src/sensor_adc.c \
+../Core/Src/sim_env.c \
 ../Core/Src/stm32f4xx_hal_msp.c \
 ../Core/Src/stm32f4xx_hal_timebase_tim.c \
 ../Core/Src/stm32f4xx_it.c \
@@ -32,6 +33,7 @@ OBJS += \
 ./Core/Src/gpio.o \
 ./Core/Src/main.o \
 ./Core/Src/sensor_adc.o \
+./Core/Src/sim_env.o \
 ./Core/Src/stm32f4xx_hal_msp.o \
 ./Core/Src/stm32f4xx_hal_timebase_tim.o \
 ./Core/Src/stm32f4xx_it.o \
@@ -54,6 +56,7 @@ C_DEPS += \
 ./Core/Src/gpio.d \
 ./Core/Src/main.d \
 ./Core/Src/sensor_adc.d \
+./Core/Src/sim_env.d \
 ./Core/Src/stm32f4xx_hal_msp.d \
 ./Core/Src/stm32f4xx_hal_timebase_tim.d \
 ./Core/Src/stm32f4xx_it.d \
@@ -78,7 +81,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/freertos.cyclo ./Core/Src/freertos.d ./Core/Src/freertos.o ./Core/Src/freertos.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/sensor_adc.cyclo ./Core/Src/sensor_adc.d ./Core/Src/sensor_adc.o ./Core/Src/sensor_adc.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_hal_timebase_tim.cyclo ./Core/Src/stm32f4xx_hal_timebase_tim.d ./Core/Src/stm32f4xx_hal_timebase_tim.o ./Core/Src/stm32f4xx_hal_timebase_tim.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su ./Core/Src/task_airflow.cyclo ./Core/Src/task_airflow.d ./Core/Src/task_airflow.o ./Core/Src/task_airflow.su ./Core/Src/task_alarm_manager.cyclo ./Core/Src/task_alarm_manager.d ./Core/Src/task_alarm_manager.o ./Core/Src/task_alarm_manager.su ./Core/Src/task_co_sensor.cyclo ./Core/Src/task_co_sensor.d ./Core/Src/task_co_sensor.o ./Core/Src/task_co_sensor.su ./Core/Src/task_methane.cyclo ./Core/Src/task_methane.d ./Core/Src/task_methane.o ./Core/Src/task_methane.su ./Core/Src/task_pump_flow.cyclo ./Core/Src/task_pump_flow.d ./Core/Src/task_pump_flow.o ./Core/Src/task_pump_flow.su ./Core/Src/task_pump_manager.cyclo ./Core/Src/task_pump_manager.d ./Core/Src/task_pump_manager.o ./Core/Src/task_pump_manager.su ./Core/Src/task_ui_comms.cyclo ./Core/Src/task_ui_comms.d ./Core/Src/task_ui_comms.o ./Core/Src/task_ui_comms.su ./Core/Src/task_water_level.cyclo ./Core/Src/task_water_level.d ./Core/Src/task_water_level.o ./Core/Src/task_water_level.su ./Core/Src/usart.cyclo ./Core/Src/usart.d ./Core/Src/usart.o ./Core/Src/usart.su
+	-$(RM) ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/freertos.cyclo ./Core/Src/freertos.d ./Core/Src/freertos.o ./Core/Src/freertos.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/sensor_adc.cyclo ./Core/Src/sensor_adc.d ./Core/Src/sensor_adc.o ./Core/Src/sensor_adc.su ./Core/Src/sim_env.cyclo ./Core/Src/sim_env.d ./Core/Src/sim_env.o ./Core/Src/sim_env.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_hal_timebase_tim.cyclo ./Core/Src/stm32f4xx_hal_timebase_tim.d ./Core/Src/stm32f4xx_hal_timebase_tim.o ./Core/Src/stm32f4xx_hal_timebase_tim.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su ./Core/Src/task_airflow.cyclo ./Core/Src/task_airflow.d ./Core/Src/task_airflow.o ./Core/Src/task_airflow.su ./Core/Src/task_alarm_manager.cyclo ./Core/Src/task_alarm_manager.d ./Core/Src/task_alarm_manager.o ./Core/Src/task_alarm_manager.su ./Core/Src/task_co_sensor.cyclo ./Core/Src/task_co_sensor.d ./Core/Src/task_co_sensor.o ./Core/Src/task_co_sensor.su ./Core/Src/task_methane.cyclo ./Core/Src/task_methane.d ./Core/Src/task_methane.o ./Core/Src/task_methane.su ./Core/Src/task_pump_flow.cyclo ./Core/Src/task_pump_flow.d ./Core/Src/task_pump_flow.o ./Core/Src/task_pump_flow.su ./Core/Src/task_pump_manager.cyclo ./Core/Src/task_pump_manager.d ./Core/Src/task_pump_manager.o ./Core/Src/task_pump_manager.su ./Core/Src/task_ui_comms.cyclo ./Core/Src/task_ui_comms.d ./Core/Src/task_ui_comms.o ./Core/Src/task_ui_comms.su ./Core/Src/task_water_level.cyclo ./Core/Src/task_water_level.d ./Core/Src/task_water_level.o ./Core/Src/task_water_level.su ./Core/Src/usart.cyclo ./Core/Src/usart.d ./Core/Src/usart.o ./Core/Src/usart.su
 
 .PHONY: clean-Core-2f-Src
 

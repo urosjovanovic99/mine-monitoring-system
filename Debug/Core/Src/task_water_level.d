@@ -43,7 +43,8 @@ Core/Src/task_water_level.o: ../Core/Src/task_water_level.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/sensor_adc.h ../Core/Inc/adc.h
+ ../Core/Inc/sensor_adc.h ../Core/Inc/adc.h ../Core/Inc/sim_env.h \
+ ../Core/Inc/task_pump_manager.h ../Core/Inc/sim_env.h
 ../Core/Inc/task_water_level.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -91,3 +92,6 @@ Core/Src/task_water_level.o: ../Core/Src/task_water_level.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/sensor_adc.h:
 ../Core/Inc/adc.h:
+../Core/Inc/sim_env.h:
+../Core/Inc/task_pump_manager.h:
+../Core/Inc/sim_env.h:

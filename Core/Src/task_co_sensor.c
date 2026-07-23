@@ -28,7 +28,7 @@ void COSensorTask_Run(void *argument)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-    bConversionOk = ADC_HW_ReadValue(&hadc2, &coValue);
+    bConversionOk = Sensor_ReadWithFaults(SIM_SENSOR_CO, &hadc2, &coValue);
     ADC_HW_StartConversion(&hadc2);
 
     if (bConversionOk)
