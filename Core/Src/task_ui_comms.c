@@ -122,14 +122,14 @@ static void UIComms_SendTelemetry(void)
       "\"airflow\":%u,\"airflow_valid\":%u,"
       "\"waterflow\":%u,"
       "\"water_level\":%u,"
-      "\"water_sim\":%u,\"water_level_mm\":%d,"
+      "\"water_sim\":%u,\"water_level_mm\":%d,\"water_rate\":%d,"
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
 	  (unsigned)waterFlowState,
 	  (unsigned)waterLevelState,
-	  (unsigned)waterSimEnabled, (int)waterSimLevel_mm,
+	  (unsigned)waterSimEnabled, (int)waterSimLevel_mm, (int)waterSimRate_mm_s,
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)

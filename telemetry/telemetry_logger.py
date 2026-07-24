@@ -4,7 +4,8 @@ from datetime import datetime
 
 COLUMNS = [
     "Timestamp", "CH4", "CO", "Air Flow",
-    "Pump water flow", "WATER_LEVEL", "Pump flag", "Alarm flag", "User action",
+    "Pump water flow", "WATER_LEVEL", "Rate (mm/s)",
+    "Pump flag", "Alarm flag", "User action",
 ]
 
 # Mirrors the firmware WaterLevelEvent_t enum (main.h):
@@ -56,6 +57,7 @@ class TelemetryArchiver:
             data.get("airflow", ""),
             "FLOW" if data.get("waterflow") else "NO FLOW",
             water_level_text(data.get("water_level")),
+            data.get("water_rate", ""),
             "ON" if data.get("pump") else "OFF",
             "ACTIVE" if data.get("alarm") else "DEACTIVATED",
             user_action,
