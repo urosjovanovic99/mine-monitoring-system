@@ -128,6 +128,11 @@ osMessageQueueId_t pumpCommandQueueHandle;
 const osMessageQueueAttr_t pumpCommandQueue_attributes = {
   .name = "pumpCommandQueue"
 };
+/* Definitions for waterSimTimer */
+osTimerId_t waterSimTimerHandle;
+const osTimerAttr_t waterSimTimer_attributes = {
+  .name = "waterSimTimer"
+};
 /* Definitions for sensorDataMutex */
 osMutexId_t sensorDataMutexHandle;
 const osMutexAttr_t sensorDataMutex_attributes = {
@@ -168,6 +173,7 @@ void StartPumpFlowTask(void *argument);
 void StartPumpManagerTask(void *argument);
 void StartAlarmManageTask(void *argument);
 void StartUICommsTask(void *argument);
+void WaterSimTimerCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -178,11 +184,6 @@ void vApplicationMallocFailedHook(void);
 /* USER CODE BEGIN 4 */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
-  /* Blocking, mutex-free HAL_UART_Transmit - same call every task already
-   * uses for logging - deliberately not going through uartLogMutexHandle:
-   * the scheduler that would arbitrate it may itself be compromised by the
-   * time this runs. Halt immediately afterward instead of letting a
-   * corrupted task keep going. */
   char msg[64];
   int len = snprintf(msg, sizeof(msg), "STACK OVERFLOW: %s\r\n", (char *)pcTaskName);
   HAL_UART_Transmit(&huart2, (uint8_t *)msg, (uint16_t)len, 100);
@@ -234,8 +235,13 @@ void MX_FREERTOS_Init(void) {
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of waterSimTimer */
+  waterSimTimerHandle = osTimerNew(WaterSimTimerCallback, osTimerPeriodic, NULL, &waterSimTimer_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
+  osTimerStart(waterSimTimerHandle, WATER_SIM_TICK_MS);
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
@@ -415,6 +421,14 @@ void StartUICommsTask(void *argument)
   /* USER CODE BEGIN StartUICommsTask */
   UICommsTask_Run(argument);
   /* USER CODE END StartUICommsTask */
+}
+
+/* WaterSimTimerCallback function */
+void WaterSimTimerCallback(void *argument)
+{
+  /* USER CODE BEGIN WaterSimTimerCallback */
+  WaterSim_TimerCb(argument);
+  /* USER CODE END WaterSimTimerCallback */
 }
 
 /* Private application code --------------------------------------------------*/

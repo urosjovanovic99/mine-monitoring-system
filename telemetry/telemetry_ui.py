@@ -5,6 +5,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QPushButton, QHBoxLayout, QStatusBar,
+    QGroupBox, QCheckBox, QSlider, QProgressBar,
 )
 
 from telemetry_logger import TelemetryArchiver, water_level_text
@@ -86,7 +87,7 @@ class DashboardWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mine Monitoring - Telemetry")
-        self.resize(520, 260)
+        self.resize(520, 420)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -133,6 +134,43 @@ class DashboardWindow(QMainWindow):
         buttons.addWidget(self.pump_switch)
         layout.addLayout(buttons)
 
+        # --- Simulation / Environment panel -------------------------------
+        # This is a test-harness control, not an operator control: when enabled
+        # the UI plays the role of the physical environment and drives how fast
+        # the water level rises or falls. With it off, the firmware runs purely
+        # on the real EXTI float-switch inputs.
+        sim_group = QGroupBox("Simulation / Environment (test)")
+        sim_layout = QVBoxLayout(sim_group)
+
+        self.sim_enable = QCheckBox("Simulate water level (override EXTI)")
+        sim_layout.addWidget(self.sim_enable)
+
+        rate_row = QHBoxLayout()
+        rate_row.addWidget(QLabel("Rate:"))
+        self.rate_slider = QSlider(Qt.Horizontal)
+        self.rate_slider.setMinimum(-100)   # mm/s, draining
+        self.rate_slider.setMaximum(100)    # mm/s, filling
+        self.rate_slider.setValue(0)
+        self.rate_slider.setTickInterval(25)
+        self.rate_slider.setTickPosition(QSlider.TicksBelow)
+        self.rate_slider.setEnabled(False)
+        rate_row.addWidget(self.rate_slider, 1)
+        self.rate_value = QLabel("0 mm/s")
+        rate_row.addWidget(self.rate_value)
+        sim_layout.addLayout(rate_row)
+
+        level_row = QHBoxLayout()
+        level_row.addWidget(QLabel("Sim level:"))
+        self.level_bar = QProgressBar()
+        self.level_bar.setMinimum(0)
+        self.level_bar.setMaximum(1000)     # WATER_SIM_MAX_MM
+        self.level_bar.setValue(400)        # WATER_SIM_START_MM
+        self.level_bar.setFormat("%v mm")
+        level_row.addWidget(self.level_bar, 1)
+        sim_layout.addLayout(level_row)
+
+        layout.addWidget(sim_group)
+
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
@@ -144,6 +182,8 @@ class DashboardWindow(QMainWindow):
 
         self.ack_btn.clicked.connect(self.on_ack_clicked)
         self.pump_switch.clicked.connect(self.on_pump_switch_clicked)
+        self.sim_enable.toggled.connect(self.on_sim_toggled)
+        self.rate_slider.valueChanged.connect(self.on_rate_changed)
 
         self.client.start()
 
@@ -154,6 +194,20 @@ class DashboardWindow(QMainWindow):
     def on_pump_switch_clicked(self):
         self.archiver.log_user_action("PUMP_TOGGLE")
         self.client.send_command({"cmd": "PUMP_TOGGLE"})
+
+    def on_sim_toggled(self, enabled: bool):
+        self.rate_slider.setEnabled(enabled)
+        cmd = "WATER_SIM_ON" if enabled else "WATER_SIM_OFF"
+        self.archiver.log_user_action(cmd)
+        self.client.send_command({"cmd": cmd})
+        if enabled:
+            # push the current slider value so firmware and UI agree immediately
+            self.on_rate_changed(self.rate_slider.value())
+
+    def on_rate_changed(self, value: int):
+        self.rate_value.setText(f"{value} mm/s")
+        self.archiver.log_user_action(f"SET_WATER_RATE={value}")
+        self.client.send_command({"cmd": "SET_WATER_RATE", "rate": value})
 
     def on_telemetry(self, data: dict):
         self.archiver.log_telemetry(data)
@@ -170,6 +224,18 @@ class DashboardWindow(QMainWindow):
         self.pump_label.setText("ON" if data.get('pump') else "OFF")
         self.alarm_label.setText("ACTIVE" if data.get('alarm') else "DEACTIVATED")
         self.water_level_label.setText(water_level_text(data.get('water_level')))
+
+        # Reflect firmware-side sim state without echoing our own signals back
+        # out as new commands (block signals while syncing the widgets).
+        if 'water_level_mm' in data:
+            self.level_bar.setValue(int(data.get('water_level_mm', 0)))
+        if 'water_sim' in data:
+            sim_on = bool(data.get('water_sim'))
+            if sim_on != self.sim_enable.isChecked():
+                self.sim_enable.blockSignals(True)
+                self.sim_enable.setChecked(sim_on)
+                self.rate_slider.setEnabled(sim_on)
+                self.sim_enable.blockSignals(False)
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

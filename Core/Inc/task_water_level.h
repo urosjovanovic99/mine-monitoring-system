@@ -18,12 +18,19 @@ extern "C" {
 #define WATER_LEVEL_MIN_INTERARRIVAL_MS  5000U
 #define WATER_LEVEL_DEBOUNCE_MS          50U
 
-/* Latest accepted water level. Single writer (WaterLevelTask), read without a
- * mutex by task_ui_comms.c - same word-sized single-writer assumption already
- * relied on for waterFlowState. */
+#define WATER_SIM_TICK_MS                100U
+#define WATER_SIM_MAX_MM                 1000
+#define WATER_SIM_HIGH_MM                800
+#define WATER_SIM_LOW_MM                 200
+#define WATER_SIM_START_MM               400
+
 extern volatile WaterLevelEvent_t waterLevelState;
+extern volatile uint8_t waterSimEnabled;
+extern volatile int32_t waterSimRate_mm_s;
+extern volatile int32_t waterSimLevel_mm;
 
 void WaterLevelTask_Run(void *argument);
+void WaterSim_TimerCb(void *argument);
 
 #ifdef __cplusplus
 }

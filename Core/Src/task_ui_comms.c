@@ -17,6 +17,7 @@
 #include "usart.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* ---- RX ring buffer, filled from HAL_UART_RxCpltCallback -------------- */
 #define UI_RX_RING_SIZE   128
@@ -75,6 +76,23 @@ static void UIComms_HandleLine(const char *line)
   {
     PumpManager_Toggle();
   }
+  /* ---- Simulation control (test/environment panel, not operator HMI) ---- */
+  else if (strstr(line, "WATER_SIM_ON") != NULL)
+  {
+    waterSimEnabled = 1U;
+  }
+  else if (strstr(line, "WATER_SIM_OFF") != NULL)
+  {
+    waterSimEnabled = 0U;
+  }
+  else if (strstr(line, "SET_WATER_RATE") != NULL)
+  {
+    const char *p = strstr(line, "\"rate\":");
+    if (p != NULL)
+    {
+      waterSimRate_mm_s = (int32_t)atoi(p + 7); /* signed: + fills, - drains */
+    }
+  }
   /* Unknown/partial commands are ignored - keep this task non-blocking. */
 }
 
@@ -97,19 +115,21 @@ static void UIComms_SendTelemetry(void)
    * already relies on for activeCauses. */
   alarmSnapshot = alarmCommandedState;
 
-  char buf[192];
+  char buf[256];
   int len = snprintf(buf, sizeof(buf),
       "{\"methane\":%u,\"methane_valid\":%u,"
       "\"co\":%u,\"co_valid\":%u,"
       "\"airflow\":%u,\"airflow_valid\":%u,"
       "\"waterflow\":%u,"
       "\"water_level\":%u,"
+      "\"water_sim\":%u,\"water_level_mm\":%d,"
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
 	  (unsigned)waterFlowState,
 	  (unsigned)waterLevelState,
+	  (unsigned)waterSimEnabled, (int)waterSimLevel_mm,
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)
