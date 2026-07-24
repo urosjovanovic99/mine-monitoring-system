@@ -5,7 +5,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QPushButton, QHBoxLayout, QStatusBar,
-    QGroupBox, QCheckBox, QSlider, QProgressBar,
+    QGroupBox, QCheckBox, QSlider, QProgressBar, QComboBox,
 )
 
 from telemetry_logger import TelemetryArchiver, water_level_text
@@ -135,18 +135,18 @@ class DashboardWindow(QMainWindow):
         layout.addLayout(buttons)
 
         # --- Simulation / Environment panel -------------------------------
-        # This is a test-harness control, not an operator control: when enabled
-        # the UI plays the role of the physical environment and drives how fast
-        # the water level rises or falls. With it off, the firmware runs purely
-        # on the real EXTI float-switch inputs.
+        # Test-harness controls, not operator controls: when the master switch
+        # is on, the UI plays the role of the physical environment - it drives
+        # the water-level rate and can inject sensor (ADC) faults. With it off,
+        # the firmware runs purely on real hardware stimuli (EXTI, real ADC).
         sim_group = QGroupBox("Simulation / Environment (test)")
         sim_layout = QVBoxLayout(sim_group)
 
-        self.sim_enable = QCheckBox("Simulate water level (override EXTI)")
+        self.sim_enable = QCheckBox("Simulation mode (UI drives environment)")
         sim_layout.addWidget(self.sim_enable)
 
         rate_row = QHBoxLayout()
-        rate_row.addWidget(QLabel("Rate:"))
+        rate_row.addWidget(QLabel("Water rate:"))
         self.rate_slider = QSlider(Qt.Horizontal)
         self.rate_slider.setMinimum(-100)   # mm/s, draining
         self.rate_slider.setMaximum(100)    # mm/s, filling
@@ -169,6 +169,22 @@ class DashboardWindow(QMainWindow):
         level_row.addWidget(self.level_bar, 1)
         sim_layout.addLayout(level_row)
 
+        # Exceptional-case injection: crash a chosen sensor twice in a row so
+        # its consecutive-error counter trips the alarm.
+        crash_row = QHBoxLayout()
+        crash_row.addWidget(QLabel("Crash sensor:"))
+        self.sensor_combo = QComboBox()
+        self.sensor_combo.addItems(["METHANE", "CO", "AIRFLOW"])
+        self.sensor_combo.setEnabled(False)
+        crash_row.addWidget(self.sensor_combo, 1)
+        self.crash_btn = QPushButton("Crash (2×)")
+        self.crash_btn.setEnabled(False)
+        crash_row.addWidget(self.crash_btn)
+        sim_layout.addLayout(crash_row)
+
+        self.crashing_label = QLabel("Crashing: NONE")
+        sim_layout.addWidget(self.crashing_label)
+
         layout.addWidget(sim_group)
 
         self.status = QStatusBar()
@@ -184,6 +200,7 @@ class DashboardWindow(QMainWindow):
         self.pump_switch.clicked.connect(self.on_pump_switch_clicked)
         self.sim_enable.toggled.connect(self.on_sim_toggled)
         self.rate_slider.valueChanged.connect(self.on_rate_changed)
+        self.crash_btn.clicked.connect(self.on_crash_clicked)
 
         self.client.start()
 
@@ -197,7 +214,9 @@ class DashboardWindow(QMainWindow):
 
     def on_sim_toggled(self, enabled: bool):
         self.rate_slider.setEnabled(enabled)
-        cmd = "WATER_SIM_ON" if enabled else "WATER_SIM_OFF"
+        self.sensor_combo.setEnabled(enabled)
+        self.crash_btn.setEnabled(enabled)
+        cmd = "SIM_ON" if enabled else "SIM_OFF"
         self.archiver.log_user_action(cmd)
         self.client.send_command({"cmd": cmd})
         if enabled:
@@ -208,6 +227,11 @@ class DashboardWindow(QMainWindow):
         self.rate_value.setText(f"{value} mm/s")
         self.archiver.log_user_action(f"SET_WATER_RATE={value}")
         self.client.send_command({"cmd": "SET_WATER_RATE", "rate": value})
+
+    def on_crash_clicked(self):
+        sensor = self.sensor_combo.currentText()
+        self.archiver.log_user_action(f"CRASH_SENSOR={sensor}")
+        self.client.send_command({"cmd": "CRASH_SENSOR", "sensor": sensor})
 
     def on_telemetry(self, data: dict):
         self.archiver.log_telemetry(data)
@@ -229,13 +253,17 @@ class DashboardWindow(QMainWindow):
         # out as new commands (block signals while syncing the widgets).
         if 'water_level_mm' in data:
             self.level_bar.setValue(int(data.get('water_level_mm', 0)))
-        if 'water_sim' in data:
-            sim_on = bool(data.get('water_sim'))
+        if 'sim_mode' in data:
+            sim_on = bool(data.get('sim_mode'))
             if sim_on != self.sim_enable.isChecked():
                 self.sim_enable.blockSignals(True)
                 self.sim_enable.setChecked(sim_on)
                 self.rate_slider.setEnabled(sim_on)
+                self.sensor_combo.setEnabled(sim_on)
+                self.crash_btn.setEnabled(sim_on)
                 self.sim_enable.blockSignals(False)
+        if 'fault_sensor' in data:
+            self.crashing_label.setText(f"Crashing: {data.get('fault_sensor', 'NONE')}")
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

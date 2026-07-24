@@ -1,2 +1,2 @@
-../Core/Src/sensor_adc.c:10:6:ADC_HW_StartConversion	16	static
-../Core/Src/sensor_adc.c:15:12:ADC_HW_ReadValue	16	static
+../Core/Src/sensor_adc.c:11:6:ADC_HW_StartConversion	16	static
+../Core/Src/sensor_adc.c:16:12:ADC_HW_ReadValue	24	static

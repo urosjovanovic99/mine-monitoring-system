@@ -1,0 +1,3 @@
+../Core/Src/sensor_fault.c:15:6:SensorFault_Arm	1
+../Core/Src/sensor_fault.c:23:12:SensorFault_ShouldFail	4
+../Core/Src/sensor_fault.c:33:20:SensorFault_ArmedTarget	2

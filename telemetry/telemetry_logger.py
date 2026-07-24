@@ -4,7 +4,7 @@ from datetime import datetime
 
 COLUMNS = [
     "Timestamp", "CH4", "CO", "Air Flow",
-    "Pump water flow", "WATER_LEVEL", "Rate (mm/s)",
+    "Pump water flow", "WATER_LEVEL", "Rate (mm/s)", "Fault sensor",
     "Pump flag", "Alarm flag", "User action",
 ]
 
@@ -45,7 +45,7 @@ class TelemetryArchiver:
         return (
             data.get("methane"), data.get("co"), data.get("airflow"),
             data.get("waterflow"), data.get("water_level"),
-            data.get("pump"), data.get("alarm"),
+            data.get("pump"), data.get("alarm"), data.get("fault_sensor"),
         )
 
     @staticmethod
@@ -58,6 +58,7 @@ class TelemetryArchiver:
             "FLOW" if data.get("waterflow") else "NO FLOW",
             water_level_text(data.get("water_level")),
             data.get("water_rate", ""),
+            data.get("fault_sensor", ""),
             "ON" if data.get("pump") else "OFF",
             "ACTIVE" if data.get("alarm") else "DEACTIVATED",
             user_action,

@@ -10,13 +10,12 @@
 #include "cmsis_os.h"
 
 volatile WaterLevelEvent_t waterLevelState = WATER_LEVEL_NORMAL;
-volatile uint8_t waterSimEnabled   = 0U;
 volatile int32_t waterSimRate_mm_s = 0;
 volatile int32_t waterSimLevel_mm  = WATER_SIM_START_MM;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if ((GPIO_Pin == HIGH_WATER_Pin || GPIO_Pin == LOW_WATER_Pin) && !waterSimEnabled)
+  if ((GPIO_Pin == HIGH_WATER_Pin || GPIO_Pin == LOW_WATER_Pin) && !simModeEnabled)
   {
     osSemaphoreRelease(waterLevelSemaphoreHandle);
   }
@@ -24,7 +23,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 static WaterLevelEvent_t WaterLevel_Sample(void)
 {
-  if (waterSimEnabled)
+  if (simModeEnabled)
   {
     if (waterSimLevel_mm >= WATER_SIM_HIGH_MM) return WATER_LEVEL_HIGH;
     if (waterSimLevel_mm <= WATER_SIM_LOW_MM)  return WATER_LEVEL_LOW;
@@ -47,7 +46,7 @@ void WaterSim_TimerCb(void *argument)
   (void)argument;
   static WaterLevelEvent_t lastLogical = WATER_LEVEL_NORMAL;
 
-  if (!waterSimEnabled)
+  if (!simModeEnabled)
   {
     return;
   }

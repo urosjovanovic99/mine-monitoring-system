@@ -6,6 +6,7 @@
  */
 // sensor_adc.c
 #include "sensor_adc.h"
+#include "sensor_fault.h"
 
 void ADC_HW_StartConversion(ADC_HandleTypeDef *hadc)
 {
@@ -14,11 +15,17 @@ void ADC_HW_StartConversion(ADC_HandleTypeDef *hadc)
 
 BaseType_t ADC_HW_ReadValue(ADC_HandleTypeDef *hadc, uint16_t *outValue)
 {
-    if (HAL_ADC_PollForConversion(hadc, 0) != HAL_OK)
+    BaseType_t hwOk = (HAL_ADC_PollForConversion(hadc, 0) == HAL_OK);
+    if (hwOk)
+    {
+        *outValue = (uint16_t)HAL_ADC_GetValue(hadc);
+    }
+
+    if (SensorFault_ShouldFail(hadc))
     {
         return pdFALSE;
     }
-    *outValue = (uint16_t)HAL_ADC_GetValue(hadc);
-    return pdTRUE;
+
+    return hwOk ? pdTRUE : pdFALSE;
 }
 

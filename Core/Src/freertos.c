@@ -55,10 +55,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-/* Definition lives here because MX_FREERTOS_Init() and the RTOS object
- * handles below are CubeMX-owned; every task file pulls this in via
- * freertos_shared.h (extern SharedSensorData_t sharedSensorData;). */
 SharedSensorData_t sharedSensorData;
+volatile uint8_t simModeEnabled = 0U;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;

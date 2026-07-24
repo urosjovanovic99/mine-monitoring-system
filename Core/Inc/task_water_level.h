@@ -25,7 +25,6 @@ extern "C" {
 #define WATER_SIM_START_MM               400
 
 extern volatile WaterLevelEvent_t waterLevelState;
-extern volatile uint8_t waterSimEnabled;
 extern volatile int32_t waterSimRate_mm_s;
 extern volatile int32_t waterSimLevel_mm;
 

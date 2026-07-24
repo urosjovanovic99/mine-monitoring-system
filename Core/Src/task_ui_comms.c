@@ -12,12 +12,24 @@
 #include "task_pump_manager.h"
 #include "task_pump_flow.h"
 #include "task_water_level.h"
+#include "sensor_fault.h"
+#include "adc.h"
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+/* Map an armed ADC handle to a label for telemetry/UI. */
+static const char *UIComms_FaultSensorName(void)
+{
+  ADC_HandleTypeDef *armed = SensorFault_ArmedTarget();
+  if (armed == &hadc1) { return "METHANE"; }
+  if (armed == &hadc2) { return "CO"; }
+  if (armed == &hadc3) { return "AIRFLOW"; }
+  return "NONE";
+}
 
 /* ---- RX ring buffer, filled from HAL_UART_RxCpltCallback -------------- */
 #define UI_RX_RING_SIZE   128
@@ -77,13 +89,13 @@ static void UIComms_HandleLine(const char *line)
     PumpManager_Toggle();
   }
   /* ---- Simulation control (test/environment panel, not operator HMI) ---- */
-  else if (strstr(line, "WATER_SIM_ON") != NULL)
+  else if (strstr(line, "SIM_ON") != NULL)
   {
-    waterSimEnabled = 1U;
+    simModeEnabled = 1U;
   }
-  else if (strstr(line, "WATER_SIM_OFF") != NULL)
+  else if (strstr(line, "SIM_OFF") != NULL)
   {
-    waterSimEnabled = 0U;
+    simModeEnabled = 0U;
   }
   else if (strstr(line, "SET_WATER_RATE") != NULL)
   {
@@ -92,6 +104,20 @@ static void UIComms_HandleLine(const char *line)
     {
       waterSimRate_mm_s = (int32_t)atoi(p + 7); /* signed: + fills, - drains */
     }
+  }
+  else if (strstr(line, "CRASH_SENSOR") != NULL)
+  {
+    /* Optional "count": defaults to 2 (crash twice -> alarm). */
+    uint8_t count = SENSOR_FAULT_DEFAULT_COUNT;
+    const char *c = strstr(line, "\"count\":");
+    if (c != NULL)
+    {
+      count = (uint8_t)atoi(c + 8);
+    }
+
+    if (strstr(line, "METHANE") != NULL)      { SensorFault_Arm(&hadc1, count); }
+    else if (strstr(line, "AIRFLOW") != NULL) { SensorFault_Arm(&hadc3, count); }
+    else if (strstr(line, "CO") != NULL)      { SensorFault_Arm(&hadc2, count); }
   }
   /* Unknown/partial commands are ignored - keep this task non-blocking. */
 }
@@ -110,37 +136,29 @@ static void UIComms_SendTelemetry(void)
   pumpSnapshot = pumpCommandedState;
   osMutexRelease(pumpMutexHandle);
 
-  /* alarmCommandedState has exactly one writer (AlarmManagerTask) and is a
-   * word-sized read - same no-mutex assumption task_alarm_manager.c itself
-   * already relies on for activeCauses. */
   alarmSnapshot = alarmCommandedState;
 
-  char buf[256];
+  char buf[320];
   int len = snprintf(buf, sizeof(buf),
       "{\"methane\":%u,\"methane_valid\":%u,"
       "\"co\":%u,\"co_valid\":%u,"
       "\"airflow\":%u,\"airflow_valid\":%u,"
       "\"waterflow\":%u,"
       "\"water_level\":%u,"
-      "\"water_sim\":%u,\"water_level_mm\":%d,\"water_rate\":%d,"
+      "\"sim_mode\":%u,\"water_level_mm\":%d,\"water_rate\":%d,"
+      "\"fault_sensor\":\"%s\","
       "\"pump\":%u,\"alarm\":%u}\r\n",
       (unsigned)snapshot.methaneLevel, (unsigned)snapshot.methaneValid,
       (unsigned)snapshot.coLevel, (unsigned)snapshot.coValid,
       (unsigned)snapshot.airFlowLevel, (unsigned)snapshot.airFlowValid,
 	  (unsigned)waterFlowState,
 	  (unsigned)waterLevelState,
-	  (unsigned)waterSimEnabled, (int)waterSimLevel_mm, (int)waterSimRate_mm_s,
+	  (unsigned)simModeEnabled, (int)waterSimLevel_mm, (int)waterSimRate_mm_s,
+	  UIComms_FaultSensorName(),
       (unsigned)pumpSnapshot, (unsigned)alarmSnapshot);
 
   if (len > 0)
   {
-    /* Blocking transmit under uartLogMutexHandle, same as every other task's
-     * debug output - deliberately NOT HAL_UART_Transmit_IT: mixing a
-     * non-blocking IT transmit here with the blocking HAL_UART_Transmit
-     * calls elsewhere would let a second task call HAL_UART_Transmit while
-     * huart2 is still mid-transfer (HAL_UART_STATE_BUSY_TX), which returns
-     * HAL_BUSY instead of actually sending. Serializing everyone on the
-     * same mutex with the same (blocking) HAL call is what keeps this safe. */
     osMutexAcquire(uartLogMutexHandle, osWaitForever);
     HAL_UART_Transmit(&huart2, (uint8_t *)buf, (uint16_t)len, 100);
     osMutexRelease(uartLogMutexHandle);

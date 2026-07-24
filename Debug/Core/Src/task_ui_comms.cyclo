@@ -1,5 +1,6 @@
-../Core/Src/task_ui_comms.c:29:6:HAL_UART_RxCpltCallback	3
-../Core/Src/task_ui_comms.c:45:19:UIComms_TryReadLine	4
-../Core/Src/task_ui_comms.c:69:13:UIComms_HandleLine	9
-../Core/Src/task_ui_comms.c:99:13:UIComms_SendTelemetry	2
-../Core/Src/task_ui_comms.c:150:6:UICommsTask_Run	2
+../Core/Src/task_ui_comms.c:25:20:UIComms_FaultSensorName	4
+../Core/Src/task_ui_comms.c:41:6:HAL_UART_RxCpltCallback	3
+../Core/Src/task_ui_comms.c:57:19:UIComms_TryReadLine	4
+../Core/Src/task_ui_comms.c:81:13:UIComms_HandleLine	14
+../Core/Src/task_ui_comms.c:125:13:UIComms_SendTelemetry	2
+../Core/Src/task_ui_comms.c:168:6:UICommsTask_Run	2
