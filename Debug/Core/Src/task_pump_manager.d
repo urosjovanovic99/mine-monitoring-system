@@ -45,7 +45,8 @@ Core/Src/task_pump_manager.o: ../Core/Src/task_pump_manager.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/task_methane.h ../Core/Inc/task_co_sensor.h \
- ../Core/Inc/task_airflow.h ../Core/Inc/main.h ../Core/Inc/usart.h
+ ../Core/Inc/task_airflow.h ../Core/Inc/main.h ../Core/Inc/usart.h \
+ ../Core/Inc/perf_measure.h
 ../Core/Inc/task_pump_manager.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
@@ -99,3 +100,4 @@ Core/Src/task_pump_manager.o: ../Core/Src/task_pump_manager.c \
 ../Core/Inc/task_airflow.h:
 ../Core/Inc/main.h:
 ../Core/Inc/usart.h:
+../Core/Inc/perf_measure.h:

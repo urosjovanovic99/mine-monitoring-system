@@ -1,0 +1,8 @@
+../Core/Src/perf_measure.c:27:5:Perf_TimeBaseOk	4	static
+../Core/Src/perf_measure.c:41:6:Perf_Reset	16	static
+../Core/Src/perf_measure.c:56:17:Perf_TimeSourceHz	24	static
+../Core/Src/perf_measure.c:70:6:Perf_Init	24	static,ignoring_inline_asm
+../Core/Src/perf_measure.c:99:6:Perf_Record	40	static
+../Core/Src/perf_measure.c:119:17:cyc_to_us_x100	56	static
+../Core/Src/perf_measure.c:129:5:Perf_FormatReport	312	static
+../Core/Src/perf_measure.c:162:5:Perf_FormatJson	280	static

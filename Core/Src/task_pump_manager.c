@@ -14,6 +14,7 @@
 #include "main.h"
 #include "usart.h"
 #include "cmsis_os.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 PumpState_t pumpCommandedState = PUMP_OFF;
@@ -101,6 +102,8 @@ void PumpManagerTask_Run(void *argument) {
 		continue;
 	  }
 
+	  MEASURE_EXECUTION_TIME_BEGIN();
+
 	  WaterLevelEvent_t evt = (WaterLevelEvent_t)rawEvent;
 
 	  switch(evt){
@@ -138,5 +141,7 @@ void PumpManagerTask_Run(void *argument) {
         break;
 	  }
 	  }
+
+	  MEASURE_EXECUTION_TIME_END(PERF_TASK_PUMPMANAGER);
   }
 }

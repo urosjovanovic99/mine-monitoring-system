@@ -187,6 +187,14 @@ class DashboardWindow(QMainWindow):
 
         layout.addWidget(sim_group)
 
+        # --- Task WCET panel (measurement builds stream {"perf":{...}}) ----
+        perf_group = QGroupBox("Task WCET (µs) - measurement mode")
+        perf_layout = QVBoxLayout(perf_group)
+        self.perf_label = QLabel("waiting for perf data…")
+        self.perf_label.setStyleSheet("font-family: monospace;")
+        perf_layout.addWidget(self.perf_label)
+        layout.addWidget(perf_group)
+
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
@@ -234,6 +242,13 @@ class DashboardWindow(QMainWindow):
         self.client.send_command({"cmd": "CRASH_SENSOR", "sensor": sensor})
 
     def on_telemetry(self, data: dict):
+        # Perf frames are a separate message type: route them to the WCET
+        # panel and return early so they never touch the sensor widgets
+        # (which read via data.get(...) and would otherwise blank out).
+        if 'perf' in data:
+            self.update_perf(data['perf'])
+            return
+
         self.archiver.log_telemetry(data)
 
         def fmt(value, valid_key):
@@ -264,6 +279,21 @@ class DashboardWindow(QMainWindow):
                 self.sim_enable.blockSignals(False)
         if 'fault_sensor' in data:
             self.crashing_label.setText(f"Crashing: {data.get('fault_sensor', 'NONE')}")
+
+    def update_perf(self, perf: dict):
+        # Firmware sends min/avg/max as microseconds x100 (fixed point) to
+        # avoid float printf on the MCU; divide by 100 for display.
+        header = f"{'Task':<13}{'n':>7}{'min':>9}{'avg':>9}{'max':>9}"
+        rows = [header]
+        for name, v in perf.items():
+            try:
+                n, mn, av, mx = v
+            except (TypeError, ValueError):
+                continue
+            rows.append(
+                f"{name:<13}{n:>7}{mn/100:>9.2f}{av/100:>9.2f}{mx/100:>9.2f}"
+            )
+        self.perf_label.setText("\n".join(rows))
 
     def on_connection_changed(self, connected: bool, message: str):
         self.status.showMessage(message)

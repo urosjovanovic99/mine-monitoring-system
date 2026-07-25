@@ -10,6 +10,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 AlarmState_t alarmCommandedState = ALARM_OFF;
@@ -46,6 +47,8 @@ void AlarmManagerTask_Run(void *argument)
       continue; /* real error only - osWaitForever can't time out */
     }
 
+    MEASURE_EXECUTION_TIME_BEGIN();
+
     if (bits & ALARM_BIT_ACK)
     {
       /* Operator reset. Safety-first: if a genuine new cause bit
@@ -65,5 +68,7 @@ void AlarmManagerTask_Run(void *argument)
                          (shouldBe == ALARM_ON) ? GPIO_PIN_SET : GPIO_PIN_RESET);
       alarmCommandedState = shouldBe;
     }
+
+    MEASURE_EXECUTION_TIME_END(PERF_TASK_ALARMMANAGER);
   }
 }

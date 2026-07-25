@@ -12,6 +12,7 @@
 #include "sensor_adc.h"
 #include "usart.h"
 #include "cmsis_os.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 void MethaneTask_Run(void *argument)
@@ -31,6 +32,7 @@ void MethaneTask_Run(void *argument)
   for (;;)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
+    MEASURE_EXECUTION_TIME_BEGIN();
 
     /* This conversion was started one period (100 ms) ago; ADC max
        latency is 50 ms -> guaranteed complete. No polling needed for
@@ -78,5 +80,7 @@ void MethaneTask_Run(void *argument)
         AlarmManager_RaiseCause(ALARM_BIT_METHANE);
       }
     }
+
+    MEASURE_EXECUTION_TIME_END(PERF_TASK_METHANE);
   }
 }

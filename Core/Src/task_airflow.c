@@ -11,6 +11,7 @@
 #include "sensor_adc.h"
 #include "usart.h"
 #include "cmsis_os.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 void AirFlowTask_Run(void *argument)
@@ -27,6 +28,7 @@ void AirFlowTask_Run(void *argument)
   for (;;)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
+    MEASURE_EXECUTION_TIME_BEGIN();
 
     bConversionOk = ADC_HW_ReadValue(&hadc3, &airFlowValue);
     ADC_HW_StartConversion(&hadc3);
@@ -64,5 +66,7 @@ void AirFlowTask_Run(void *argument)
         AlarmManager_RaiseCause(ALARM_BIT_AIRFLOW);
       }
     }
+
+    MEASURE_EXECUTION_TIME_END(PERF_TASK_AIRFLOW);
   }
 }

@@ -1,0 +1,8 @@
+../Core/Src/perf_measure.c:27:5:Perf_TimeBaseOk	1
+../Core/Src/perf_measure.c:41:6:Perf_Reset	2
+../Core/Src/perf_measure.c:56:17:Perf_TimeSourceHz	2
+../Core/Src/perf_measure.c:70:6:Perf_Init	2
+../Core/Src/perf_measure.c:99:6:Perf_Record	4
+../Core/Src/perf_measure.c:119:17:cyc_to_us_x100	2
+../Core/Src/perf_measure.c:129:5:Perf_FormatReport	7
+../Core/Src/perf_measure.c:162:5:Perf_FormatJson	9

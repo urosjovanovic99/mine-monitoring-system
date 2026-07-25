@@ -44,7 +44,7 @@ Core/Src/task_airflow.o: ../Core/Src/task_airflow.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/sensor_adc.h ../Core/Inc/usart.h
+ ../Core/Inc/sensor_adc.h ../Core/Inc/usart.h ../Core/Inc/perf_measure.h
 ../Core/Inc/task_airflow.h:
 ../Core/Inc/task_alarm_manager.h:
 ../Core/Inc/freertos_shared.h:
@@ -95,3 +95,4 @@ Core/Src/task_airflow.o: ../Core/Src/task_airflow.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 ../Core/Inc/sensor_adc.h:
 ../Core/Inc/usart.h:
+../Core/Inc/perf_measure.h:

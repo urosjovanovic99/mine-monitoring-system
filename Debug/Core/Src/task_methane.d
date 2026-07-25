@@ -45,7 +45,7 @@ Core/Src/task_methane.o: ../Core/Src/task_methane.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/sensor_adc.h ../Core/Inc/usart.h
+ ../Core/Inc/sensor_adc.h ../Core/Inc/usart.h ../Core/Inc/perf_measure.h
 ../Core/Inc/task_methane.h:
 ../Core/Inc/task_alarm_manager.h:
 ../Core/Inc/task_pump_manager.h:
@@ -97,3 +97,4 @@ Core/Src/task_methane.o: ../Core/Src/task_methane.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 ../Core/Inc/sensor_adc.h:
 ../Core/Inc/usart.h:
+../Core/Inc/perf_measure.h:

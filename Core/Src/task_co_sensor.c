@@ -11,6 +11,7 @@
 #include "sensor_adc.h"
 #include "usart.h"
 #include "cmsis_os.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 void COSensorTask_Run(void *argument)
@@ -27,6 +28,7 @@ void COSensorTask_Run(void *argument)
   for (;;)
   {
     vTaskDelayUntil(&xLastWakeTime, xPeriod);
+    MEASURE_EXECUTION_TIME_BEGIN();
 
     bConversionOk = ADC_HW_ReadValue(&hadc2, &coValue);
     ADC_HW_StartConversion(&hadc2);
@@ -62,5 +64,7 @@ void COSensorTask_Run(void *argument)
         AlarmManager_RaiseCause(ALARM_BIT_CO);
       }
     }
+
+    MEASURE_EXECUTION_TIME_END(PERF_TASK_CO);
   }
 }

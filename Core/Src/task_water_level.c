@@ -8,6 +8,7 @@
 #include "task_water_level.h"
 #include "freertos_shared.h"
 #include "cmsis_os.h"
+#include "perf_measure.h"
 
 volatile WaterLevelEvent_t waterLevelState = WATER_LEVEL_NORMAL;
 volatile int32_t waterSimRate_mm_s = 0;
@@ -76,6 +77,7 @@ void WaterLevelTask_Run(void *argument)
   {
     if (osSemaphoreAcquire(waterLevelSemaphoreHandle, osWaitForever) == osOK)
     {
+      MEASURE_EXECUTION_TIME_BEGIN();
       /* Sample the current level (real pins, or the simulated stimulus). */
       WaterLevelEvent_t evt = WaterLevel_Sample();
 
@@ -91,6 +93,8 @@ void WaterLevelTask_Run(void *argument)
       waterLevelState = evt; /* publish latest level for UI telemetry */
 
       osMessageQueuePut(pumpCommandQueueHandle, &evt, 0, 0);
+
+      MEASURE_EXECUTION_TIME_END(PERF_TASK_WATERLEVEL);
     }
   }
 }

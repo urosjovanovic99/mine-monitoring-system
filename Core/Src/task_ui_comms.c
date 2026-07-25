@@ -17,6 +17,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
+#include "perf_measure.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -119,6 +120,22 @@ static void UIComms_HandleLine(const char *line)
     else if (strstr(line, "AIRFLOW") != NULL) { SensorFault_Arm(&hadc3, count); }
     else if (strstr(line, "CO") != NULL)      { SensorFault_Arm(&hadc2, count); }
   }
+  /* ---- WCET measurement dump: prints per-task min/avg/max in us ---- */
+  else if (strstr(line, "PERF_RESET") != NULL)
+  {
+    Perf_Reset();
+  }
+  else if (strstr(line, "PERF") != NULL)
+  {
+    char pbuf[512];
+    int plen = Perf_FormatReport(pbuf, sizeof(pbuf));
+    if (plen > 0)
+    {
+      osMutexAcquire(uartLogMutexHandle, osWaitForever);
+      HAL_UART_Transmit(&huart2, (uint8_t *)pbuf, (uint16_t)plen, 200);
+      osMutexRelease(uartLogMutexHandle);
+    }
+  }
   /* Unknown/partial commands are ignored - keep this task non-blocking. */
 }
 
@@ -170,15 +187,40 @@ void UICommsTask_Run(void *argument)
   HAL_UART_Receive_IT(&huart2, &uiRxByte, 1); /* arm first RX byte once */
 
   char line[96];
+#if PERF_MEASURE_ENABLE
+  uint32_t perfStreamCtr = 0U;
+#endif
 
   for (;;)
   {
+    MEASURE_EXECUTION_TIME_BEGIN();
     UIComms_SendTelemetry();
 
     while (UIComms_TryReadLine(line, sizeof(line)))
     {
       UIComms_HandleLine(line);
     }
+
+    MEASURE_EXECUTION_TIME_END(PERF_TASK_UICOMMS);
+
+#if PERF_MEASURE_ENABLE
+    /* Measurement build: stream the WCET table as its own JSON line every
+     * PERF_STREAM_DIVIDER periods (~1 s). Sent AFTER the measurement window
+     * above so this reporting overhead is not counted into UIComms' own C.
+     * Uses a static buffer to keep it off this task's stack. */
+    if (++perfStreamCtr >= PERF_STREAM_DIVIDER)
+    {
+      perfStreamCtr = 0U;
+      static char perfLine[640];  /* headroom for large activation counts */
+      int pn = Perf_FormatJson(perfLine, sizeof(perfLine));
+      if (pn > 0)
+      {
+        osMutexAcquire(uartLogMutexHandle, osWaitForever);
+        HAL_UART_Transmit(&huart2, (uint8_t *)perfLine, (uint16_t)pn, 200);
+        osMutexRelease(uartLogMutexHandle);
+      }
+    }
+#endif
 
     osDelay(UI_COMMS_TASK_PERIOD_MS);
   }

@@ -10,6 +10,7 @@
 #include "freertos_shared.h"
 #include "task_pump_manager.h"
 #include "usart.h"
+#include "perf_measure.h"
 #include <stdio.h>
 
 WaterFlowState_t waterFlowState = WATER_FLOW_OFF;
@@ -29,6 +30,7 @@ void PumpFlowTask_Run(void *argument)
   for (;;)
   {
       vTaskDelayUntil(&xLastWakeTime, xPeriod);
+      MEASURE_EXECUTION_TIME_BEGIN();
 
       osMutexAcquire(pumpMutexHandle, osWaitForever);
       PumpState_t currentCommand = pumpCommandedState;
@@ -85,6 +87,8 @@ void PumpFlowTask_Run(void *argument)
               AlarmManager_RaiseCause(ALARM_BIT_PUMPFAULT);
           }
       }
+
+      MEASURE_EXECUTION_TIME_END(PERF_TASK_PUMPFLOW);
   }
   /* USER CODE END PumpFlowMonitorTask */
 }
