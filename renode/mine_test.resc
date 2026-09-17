@@ -96,6 +96,23 @@ macro flow_off
     sysbus.gpioPortB.waterFlowSwitch Release
 """
 
+# Level fell off HIGH but has not reached LOW. Pump must KEEP RUNNING.
+macro water_normal
+"""
+    sysbus.gpioPortC.highWaterButton Release
+    sysbus.gpioPortC.lowWaterButton Release
+"""
+
+# Graceful stop. Run this while PAUSED: the low-level edge and the loss of
+# flow then land at the same virtual instant, so PumpFlowTask opens its
+# settling window with the flow already gone and confirms a clean stop.
+macro pump_stop
+"""
+    sysbus.gpioPortC.highWaterButton Release
+    sysbus.gpioPortC.lowWaterButton Press
+    sysbus.gpioPortB.waterFlowSwitch Release
+"""
+
 macro reset
 """
     sysbus LoadELF @Debug/mine-monitoring-system.elf
