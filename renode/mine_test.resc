@@ -1,0 +1,106 @@
+:name: Mine Monitoring System - test bench
+:description: NUCLEO-F446RE + FreeRTOS mine monitor, with sensor stimulus macros.
+
+mach create "NUCLEO-F446RE"
+
+machine LoadPlatformDescription @renode/water_level_renode.repl
+machine LoadPlatformDescription @renode/mine_monitor_adc.repl
+
+# One backend only. Use the socket for the Python telemetry UI; uncomment
+# showAnalyzer instead if you want the raw JSON stream in a window.
+# showAnalyzer sysbus.usart2
+emulation CreateServerSocketTerminal 3456 "uartBridge" true
+connector Connect sysbus.usart2 uartBridge
+
+# ---------------------------------------------------------------- sensors ---
+# ADC channel map (must match Core/Src/adc.c):
+#   adc1 / ch 1  -> CH4   (methane)   critical  >= 1000
+#   adc2 / ch 4  -> CO                critical  >= 1000
+#   adc3 / ch 12 -> air flow          critical  <= 1000   (LOW is the fault)
+# repeat = -1 means "hold this value forever". Without it the channel drains
+# to 0 and airflow immediately latches an alarm.
+
+macro sensors_healthy
+"""
+    sysbus.adc1 FeedSample 300 1 -1
+    sysbus.adc2 FeedSample 300 4 -1
+    sysbus.adc3 FeedSample 3000 12 -1
+"""
+
+macro methane_critical
+"""
+    sysbus.adc1 FeedSample 3500 1 -1
+"""
+
+macro methane_safe
+"""
+    sysbus.adc1 FeedSample 300 1 -1
+"""
+
+macro co_critical
+"""
+    sysbus.adc2 FeedSample 3500 4 -1
+"""
+
+macro co_safe
+"""
+    sysbus.adc2 FeedSample 300 4 -1
+"""
+
+macro airflow_blocked
+"""
+    sysbus.adc3 FeedSample 200 12 -1
+"""
+
+macro airflow_ok
+"""
+    sysbus.adc3 FeedSample 3000 12 -1
+"""
+
+# ------------------------------------------------------------- actuators ----
+# PB0 = PUMP, PB2 = ALARM, read straight out of GPIOB ODR (0x40020400 + 0x14).
+#   0x00 both off | 0x01 pump on | 0x04 alarm on | 0x05 both on
+macro outputs
+"""
+    sysbus ReadDoubleWord 0x40020414
+"""
+
+# ----------------------------------------------------------------- stimuli --
+macro water_high_on
+"""
+    sysbus.gpioPortC.highWaterButton Press
+"""
+
+macro water_high_off
+"""
+    sysbus.gpioPortC.highWaterButton Release
+"""
+
+macro water_low_on
+"""
+    sysbus.gpioPortC.lowWaterButton Press
+"""
+
+macro water_low_off
+"""
+    sysbus.gpioPortC.lowWaterButton Release
+"""
+
+macro flow_on
+"""
+    sysbus.gpioPortB.waterFlowSwitch Press
+"""
+
+macro flow_off
+"""
+    sysbus.gpioPortB.waterFlowSwitch Release
+"""
+
+macro reset
+"""
+    sysbus LoadELF @Debug/mine-monitoring-system.elf
+    runMacro $sensors_healthy
+"""
+
+runMacro $reset
+echo "Loaded. Type 'start' to run, or 'pause' + 'emulation RunFor 0.4' to step."
